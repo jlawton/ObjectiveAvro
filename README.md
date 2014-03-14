@@ -7,7 +7,7 @@
 
 ### Registering schemas
 
-Avro works with (schemas)[http://avro.apache.org/docs/current/index.html#schemas]. Before using `OAVAvroSerialization` to serialize objects, you must register the schemas you'll use.
+Avro works with [schemas](http://avro.apache.org/docs/current/index.html#schemas). Before using `OAVAvroSerialization` to serialize objects, you must register the schemas you'll use.
 
 ```objective-c
 NSString *schema = @"{\"type\":\"record\",\"name\":\"Person\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"country\",\"type\":\"string\"},{\"name\":\"age\",\"type\":\"int\"}]}";
@@ -21,7 +21,7 @@ BOOL result = [avro registerSchema:schema error:&error];
 
 ```objective-c
 NSError *error;
-NSDictionary *dict = @{"name": @"Marcelo Fabri", @"country": @"Brazil", @"age": @20};
+NSDictionary *dict = @{@"name": @"Marcelo Fabri", @"country": @"Brazil", @"age": @20};
 NSData *data = [avro dataFromJSONObject:dict forSchemaNamed:@"Person" error:&error];
 ```
 
