@@ -3,11 +3,41 @@
 [![Version](http://cocoapod-badges.herokuapp.com/v/ObjectiveAvro/badge.png)](http://cocoadocs.org/docsets/ObjectiveAvro)
 [![Platform](http://cocoapod-badges.herokuapp.com/p/ObjectiveAvro/badge.png)](http://cocoadocs.org/docsets/ObjectiveAvro)
 
-## Usage
+## Usage Examples
 
-To run the example project; clone the repo, and run `pod install` from the Example directory first.
+### Registering schemas
+
+Avro works with (schemas)[http://avro.apache.org/docs/current/index.html#schemas]. Before using `OAVAvroSerialization` to serialize objects, you must register the schemas you'll use.
+
+```objective-c
+NSString *schema = @"{\"type\":\"record\",\"name\":\"Person\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"country\",\"type\":\"string\"},{\"name\":\"age\",\"type\":\"int\"}]}";
+
+OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
+NSError *error;
+BOOL result = [avro registerSchema:schema error:&error];
+```    
+
+### Transforming JSON to NSData
+
+```objective-c
+NSError *error;
+NSDictionary *dict = @{"name": @"Marcelo Fabri", @"country": @"Brazil", @"age": @20};
+NSData *data = [avro dataFromJSONObject:dict forSchemaNamed:@"Person" error:&error];
+```
+
+### Transforming NSData to JSON
+
+```objective-c
+NSError *error;
+NSData *data = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"marcelo" ofType:@"avro"]];
+NSData *data = [avro JSONObjectFromData:data forSchemaNamed:@"People" error:&error];
+```
 
 ## Requirements
+
+ObjectiveAvro requires Xcode 5, targeting either iOS 6.0 and above, or Mac OS 10.8 Mountain Lion ([64-bit with modern Cocoa runtime](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtVersionsPlatforms.html)) and above.
+
+ObjectiveAvro also requires [Avro-C](http://avro.apache.org/docs/current/api/c/index.html), which is automatically imported when using [CocoaPods](http://cocoapods.org).
 
 ## Installation
 
@@ -16,9 +46,18 @@ it simply add the following line to your Podfile:
 
     pod "ObjectiveAvro"
 
+## Testing
+
+To run the testing project; clone the repo, and run `pod install` from the Example directory first. You can run the unit tests by pressing `CMD + U` on Xcode.
+Tests are done with `XCTest` and [`Expecta`](https://github.com/specta/expecta).
+
+## Known limitations
+
+- Currently, only the following types are supported: `string`, `float`, `double`, `int`, `long`, `boolean`, `null`, `array` and `record`. That means that `map`, `bytes`, `enums`, `unions` and `fixed` **are not** currently supported.
+
 ## Author
 
-Marcelo Fabri, marcelofabrimf@gmail.com
+Marcelo Fabri, me@marcelofabri.com
 
 ## License
 
