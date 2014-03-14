@@ -3,6 +3,26 @@
 [![Version](http://cocoapod-badges.herokuapp.com/v/ObjectiveAvro/badge.png)](http://cocoadocs.org/docsets/ObjectiveAvro)
 [![Platform](http://cocoapod-badges.herokuapp.com/p/ObjectiveAvro/badge.png)](http://cocoadocs.org/docsets/ObjectiveAvro)
 
+## What is ObjectiveAvro?
+
+**ObjectiveAvro** is a wrapper on [Avro-C](http://avro.apache.org/docs/current/api/c/index.html), (almost) mimicking the interface of `NSJSONSerialization`. 
+
+## But what is this Avro thing?
+
+From [Avro Documentation](http://avro.apache.org/docs/current/):
+
+> Apache Avro™ is a data serialization system.
+
+> Avro provides:
+
+>    - Rich data structures.
+>    - A compact, fast, binary data format.
+>    - A container file, to store persistent data.
+>    - Remote procedure call (RPC).
+>    - Simple integration with dynamic languages. Code generation is not required to read or write data files nor to use or implement RPC protocols. Code generation as an optional optimization, only worth implementing for statically typed languages.
+
+Basically, you can serialize data to a fast and compact binary format (which is very handy on a mobile device!). However, there isn't an official API for Objective-C, only C, C++, C#, Java and Python. **ObjectiveAvro** is the midfield between your Objective-C code and [Avro-C](http://avro.apache.org/docs/current/api/c/index.html).
+
 ## Usage Examples
 
 ### Registering schemas
@@ -35,13 +55,13 @@ NSData *data = [avro JSONObjectFromData:data forSchemaNamed:@"People" error:&err
 
 ## Requirements
 
-ObjectiveAvro requires Xcode 5, targeting either iOS 6.0 and above, or Mac OS 10.8 Mountain Lion ([64-bit with modern Cocoa runtime](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtVersionsPlatforms.html)) and above.
+**ObjectiveAvro** requires Xcode 5, targeting either iOS 6.0 and above, or Mac OS 10.8 Mountain Lion ([64-bit with modern Cocoa runtime](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtVersionsPlatforms.html)) and above.
 
-ObjectiveAvro also requires [Avro-C](http://avro.apache.org/docs/current/api/c/index.html), which is automatically imported when using [CocoaPods](http://cocoapods.org).
+**ObjectiveAvro** also requires [Avro-C](http://avro.apache.org/docs/current/api/c/index.html), which is automatically imported when using [CocoaPods](http://cocoapods.org).
 
 ## Installation
 
-ObjectiveAvro is available through [CocoaPods](http://cocoapods.org), to install
+**ObjectiveAvro** is available through [CocoaPods](http://cocoapods.org), to install
 it simply add the following line to your Podfile:
 
     pod "ObjectiveAvro"
@@ -61,5 +81,5 @@ Marcelo Fabri, me@marcelofabri.com
 
 ## License
 
-ObjectiveAvro is available under the MIT license. See the LICENSE file for more info.
+**ObjectiveAvro** is available under the MIT license. See the LICENSE file for more info.
 
