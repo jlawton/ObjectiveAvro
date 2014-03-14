@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "ObjectiveAvro"
-  s.version          = "1.0.0"
+  s.version          = "0.1.0"
   s.summary          = "ObjectiveAvro is a wrapper on Avro-C, (almost) mimicking the interface of NSJSONSerialization."
   s.homepage         = "https://github.com/Movile/ObjectiveAvro"
   s.license          = 'MIT'
