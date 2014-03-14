@@ -1,7 +1,8 @@
+inhibit_all_warnings!
+
 pod "ObjectiveAvro", :path => "../ObjectiveAvro.podspec"
 
-target "Demo" do
-end
 
-target "DemoTests" do
+target "ObjectiveAvroTests" do
+	pod 'Expecta'
 end
