@@ -73,7 +73,7 @@ Tests are done with `XCTest` and [`Expecta`](https://github.com/specta/expecta).
 
 ## Known limitations
 
-- Currently, only the following types are supported: `string`, `float`, `double`, `int`, `long`, `boolean`, `null`, `array` and `record`. That means that `map`, `bytes`, `enums`, `unions` and `fixed` **are not** currently supported.
+- Currently, only the following types are supported: `string`, `float`, `double`, `int`, `long`, `boolean`, `null`, `array` and `record`. That means that `map`, `bytes`, `enum`, `union` and `fixed` **are not** currently supported.
 
 ## Author
 
