@@ -211,6 +211,8 @@
         return avro_schema_boolean();
     } else if ([name isEqual:@"null"]) {
         return avro_schema_null();
+    } else if ([name isEqual:@"bytes"]) {
+        return avro_schema_bytes();
     }
     
     
@@ -259,6 +261,9 @@
         value = avro_boolean([values boolValue]);
     } else if ([type isEqualToString:@"null"]) {
         value = avro_null();
+    } else if ([type isEqualToString:@"bytes"]) {
+        char *str = [values cStringUsingEncoding:NSUTF8StringEncoding];
+        value = avro_bytes(str, strlen(str) + 1);
     } else if ([type isEqualToString:@"map"]) {
         
         id mapValues = schema[@"values"];
