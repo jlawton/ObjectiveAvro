@@ -50,7 +50,7 @@ NSData *data = [avro dataFromJSONObject:dict forSchemaNamed:@"Person" error:&err
 ```objective-c
 NSError *error;
 NSData *data = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"marcelo" ofType:@"avro"]];
-NSData *data = [avro JSONObjectFromData:data forSchemaNamed:@"People" error:&error];
+NSData *data = [avro JSONObjectFromData:data forSchemaNamed:@"Person" error:&error];
 ```
 
 ## Requirements
