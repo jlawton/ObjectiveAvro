@@ -5,7 +5,7 @@
 
 ## What is ObjectiveAvro?
 
-**ObjectiveAvro** is a wrapper on [Avro-C](http://avro.apache.org/docs/current/api/c/index.html), (almost) mimicking the interface of `NSJSONSerialization`. 
+**ObjectiveAvro** is a wrapper on [Avro-C](http://avro.apache.org/docs/current/api/c/index.html), following the API conventions of Foundation's `NSJSONSerialization` class.
 
 ## But what is this Avro thing?
 
