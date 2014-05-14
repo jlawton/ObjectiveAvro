@@ -282,7 +282,16 @@
         }];
     } else if ([type isEqualToString:@"record"]) {
         
-        value = avro_record([self schemaFromName:name]);
+        avro_schema_t itemsSchema = [self schemaFromName:name];
+        
+        if (! itemsSchema) {
+            avro_schema_error_t avroError;
+            NSData *schemaJSON = [NSJSONSerialization dataWithJSONObject:schema options:0 error:nil];
+            const char *cSchema = [[[NSString alloc] initWithData:schemaJSON encoding:NSUTF8StringEncoding] cStringUsingEncoding:NSUTF8StringEncoding];
+            avro_schema_from_json(cSchema, sizeof(cSchema), &itemsSchema, &avroError);
+        }
+        
+        value = avro_record(itemsSchema);
         
         [schema[@"fields"] enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL *stop) {
             NSString *fieldName = obj[@"name"];
