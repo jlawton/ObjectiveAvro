@@ -86,7 +86,7 @@ avro_refcount_dec(volatile int *refcount)
  * Mac OS X
  */
 
-#elif __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050
+#elif __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050 || defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 
 #include <libkern/OSAtomic.h>
 
