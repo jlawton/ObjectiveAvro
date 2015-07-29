@@ -35,9 +35,9 @@
 
 #if DEBUG_RESOLVER
 #include <stdio.h>
-#define debug(...) { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); }
+#define AVRO_DEBUG(...) { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); }
 #else
-#define debug(...) /* no debug output */
+#define AVRO_DEBUG(...) /* no debug output */
 #endif
 
 
@@ -156,7 +156,7 @@ avro_resolver_get_real_dest(avro_resolver_t *resolver, avro_datum_t dest)
 		return dest;
 	}
 
-	debug("Retrieving union branch %d for %s value",
+	AVRO_DEBUG("Retrieving union branch %d for %s value",
 	      resolver->reader_union_branch,
 	      avro_schema_type_name(resolver->parent.schema));
 
@@ -206,7 +206,7 @@ do {								\
 	int  rc = check_func(saved, &self, wschema, rschema,	\
 			     rschema);				\
 	if (self) {						\
-		debug("Non-union schemas %s (writer) "		\
+		AVRO_DEBUG("Non-union schemas %s (writer) "		\
 		      "and %s (reader) match",			\
 		      avro_schema_type_name(wschema),		\
 		      avro_schema_type_name(rschema));		\
@@ -235,7 +235,7 @@ do {									\
 		break;							\
 	}								\
 									\
-	debug("Checking reader union schema");				\
+	AVRO_DEBUG("Checking reader union schema");				\
 	size_t  num_branches = avro_schema_union_size(rschema);		\
 	unsigned int  i;						\
 									\
@@ -248,14 +248,14 @@ do {									\
 				     wschema, branch_schema,		\
 				     rschema);				\
 		if (self) {						\
-			debug("Reader union branch %d (%s) "		\
+			AVRO_DEBUG("Reader union branch %d (%s) "		\
 			      "and writer %s match",			\
 			      i, avro_schema_type_name(branch_schema),	\
 			      avro_schema_type_name(wschema));		\
 			self->reader_union_branch = i;			\
 			return &self->parent;				\
 		} else {						\
-			debug("Reader union branch %d (%s) "		\
+			AVRO_DEBUG("Reader union branch %d (%s) "		\
 			      "doesn't match",				\
 			      i, avro_schema_type_name(branch_schema));	\
 		}							\
@@ -265,7 +265,7 @@ do {									\
 		}							\
 	}								\
 									\
-	debug("No reader union branches match");			\
+	AVRO_DEBUG("No reader union branches match");			\
 } while (0)
 
 /**
@@ -277,7 +277,7 @@ do {									\
 do {									\
 	check_non_union(saved, wschema, rschema, try_##type_name);	\
 	check_reader_union(saved, wschema, rschema, try_##type_name);	\
-	debug("Writer %s doesn't match reader %s",			\
+	AVRO_DEBUG("Writer %s doesn't match reader %s",			\
 	      avro_schema_type_name(wschema),				\
 	      avro_schema_type_name(rschema));				\
 	avro_set_error("Cannot store " #type_name " into %s",		\
@@ -297,7 +297,7 @@ avro_resolver_boolean_value(avro_consumer_t *consumer, int value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %s into %p", value? "TRUE": "FALSE", dest);
+	AVRO_DEBUG("Storing %s into %p", value? "TRUE": "FALSE", dest);
 	return avro_boolean_set(dest, value);
 }
 
@@ -333,7 +333,7 @@ avro_resolver_bytes_value(avro_consumer_t *consumer,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %" PRIsz " bytes into %p", value_len, dest);
+	AVRO_DEBUG("Storing %" PRIsz " bytes into %p", value_len, dest);
 	return avro_givebytes_set(dest, (const char *) value, value_len, free_bytes);
 }
 
@@ -358,7 +358,7 @@ avro_resolver_double_value(avro_consumer_t *consumer, double value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %le into %p", value, dest);
+	AVRO_DEBUG("Storing %le into %p", value, dest);
 	return avro_double_set(dest, value);
 }
 
@@ -383,7 +383,7 @@ avro_resolver_float_value(avro_consumer_t *consumer, float value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %e into %p", value, dest);
+	AVRO_DEBUG("Storing %e into %p", value, dest);
 	return avro_float_set(dest, value);
 }
 
@@ -394,7 +394,7 @@ avro_resolver_float_double_value(avro_consumer_t *consumer, float value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %e into %p (promoting float to double)", value, dest);
+	AVRO_DEBUG("Storing %e into %p (promoting float to double)", value, dest);
 	return avro_double_set(dest, value);
 }
 
@@ -424,7 +424,7 @@ avro_resolver_int_value(avro_consumer_t *consumer, int32_t value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %" PRId32 " into %p", value, dest);
+	AVRO_DEBUG("Storing %" PRId32 " into %p", value, dest);
 	return avro_int32_set(dest, value);
 }
 
@@ -435,7 +435,7 @@ avro_resolver_int_long_value(avro_consumer_t *consumer, int32_t value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %" PRId32 " into %p (promoting int to long)", value, dest);
+	AVRO_DEBUG("Storing %" PRId32 " into %p (promoting int to long)", value, dest);
 	return avro_int64_set(dest, value);
 }
 
@@ -446,7 +446,7 @@ avro_resolver_int_double_value(avro_consumer_t *consumer, int32_t value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %" PRId32 " into %p (promoting int to double)", value, dest);
+	AVRO_DEBUG("Storing %" PRId32 " into %p (promoting int to double)", value, dest);
 	return avro_double_set(dest, value);
 }
 
@@ -457,7 +457,7 @@ avro_resolver_int_float_value(avro_consumer_t *consumer, int32_t value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %" PRId32 " into %p (promoting int to float)", value, dest);
+	AVRO_DEBUG("Storing %" PRId32 " into %p (promoting int to float)", value, dest);
 	return avro_float_set(dest, (const float) value);
 }
 
@@ -497,7 +497,7 @@ avro_resolver_long_value(avro_consumer_t *consumer, int64_t value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %" PRId64 " into %p", value, dest);
+	AVRO_DEBUG("Storing %" PRId64 " into %p", value, dest);
 	return avro_int64_set(dest, value);
 }
 
@@ -508,7 +508,7 @@ avro_resolver_long_float_value(avro_consumer_t *consumer, int64_t value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %" PRId64 " into %p (promoting long to float)", value, dest);
+	AVRO_DEBUG("Storing %" PRId64 " into %p (promoting long to float)", value, dest);
 	return avro_float_set(dest, (const float) value);
 }
 
@@ -519,7 +519,7 @@ avro_resolver_long_double_value(avro_consumer_t *consumer, int64_t value,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing %" PRId64 " into %p (promoting long to double)", value, dest);
+	AVRO_DEBUG("Storing %" PRId64 " into %p (promoting long to double)", value, dest);
 	return avro_double_set(dest, (const double) value);
 }
 
@@ -555,7 +555,7 @@ avro_resolver_null_value(avro_consumer_t *consumer, void *user_data)
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
 
 	AVRO_UNUSED(dest);
-	debug("Storing null into %p", dest);
+	AVRO_DEBUG("Storing null into %p", dest);
 	return 0;
 }
 
@@ -582,7 +582,7 @@ avro_resolver_string_value(avro_consumer_t *consumer,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing \"%s\" into %p", (const char *) value, dest);
+	AVRO_DEBUG("Storing \"%s\" into %p", (const char *) value, dest);
 	return avro_givestring_set(dest, (const char *) value, avro_alloc_free_func);
 }
 
@@ -616,7 +616,7 @@ avro_resolver_array_start_block(avro_consumer_t *consumer,
 		avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
 		AVRO_UNUSED(dest);
 
-		debug("Starting array %p", dest);
+		AVRO_DEBUG("Starting array %p", dest);
 	}
 
 	AVRO_UNUSED(block_count);
@@ -635,7 +635,7 @@ avro_resolver_array_element(avro_consumer_t *consumer,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Adding element to array %p", dest);
+	AVRO_DEBUG("Adding element to array %p", dest);
 
 	/*
 	 * Allocate a new element datum and add it to the array.
@@ -722,7 +722,7 @@ avro_resolver_enum_value(avro_consumer_t *consumer, int value,
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
 
 	const char  *symbol_name = avro_schema_enum_get(resolver->parent.schema, value);
-	debug("Storing symbol %s into %p", symbol_name, dest);
+	AVRO_DEBUG("Storing symbol %s into %p", symbol_name, dest);
 	return avro_enum_set_name(dest, symbol_name);
 }
 
@@ -762,7 +762,7 @@ avro_resolver_fixed_value(avro_consumer_t *consumer,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Storing (fixed) %" PRIsz " bytes into %p", value_len, dest);
+	AVRO_DEBUG("Storing (fixed) %" PRIsz " bytes into %p", value_len, dest);
 	return avro_givefixed_set(dest, (const char *) value, value_len, avro_alloc_free_func);
 }
 
@@ -800,7 +800,7 @@ avro_resolver_map_start_block(avro_consumer_t *consumer,
 		avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
 		AVRO_UNUSED(dest);
 
-		debug("Starting map %p", dest);
+		AVRO_DEBUG("Starting map %p", dest);
 	}
 
 	AVRO_UNUSED(block_count);
@@ -820,7 +820,7 @@ avro_resolver_map_element(avro_consumer_t *consumer,
 	avro_resolver_t  *resolver = (avro_resolver_t *) consumer;
 	avro_datum_t  ud_dest = (avro_datum_t) user_data;
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
-	debug("Adding element to map %p", dest);
+	AVRO_DEBUG("Adding element to map %p", dest);
 
 	/*
 	 * Allocate a new element datum and add it to the map.
@@ -905,7 +905,7 @@ avro_resolver_record_start(avro_consumer_t *consumer,
 	avro_datum_t  dest = avro_resolver_get_real_dest(resolver, ud_dest);
 	AVRO_UNUSED(dest);
 
-	debug("Starting record at %p", dest);
+	AVRO_DEBUG("Starting record at %p", dest);
 
 	/*
 	 * TODO: Eventually, we'll fill in default values for the extra
@@ -935,11 +935,11 @@ avro_resolver_record_field(avro_consumer_t *consumer,
 	 * record, and should be skipped.
 	 */
 
-	debug("Retrieving resolver for writer field %i (%s)",
+	AVRO_DEBUG("Retrieving resolver for writer field %i (%s)",
 	      index, field_name);
 
 	if (!resolver->child_resolvers[index]) {
-		debug("Reader doesn't have field %s, skipping", field_name);
+		AVRO_DEBUG("Reader doesn't have field %s, skipping", field_name);
 		return 0;
 	}
 
@@ -1002,7 +1002,7 @@ try_record(avro_memoize_t *mem, avro_resolver_t **resolver,
 	size_t  wfields = avro_schema_record_size(wschema);
 	size_t  rfields = avro_schema_record_size(rschema);
 
-	debug("Checking writer record schema %s", wname);
+	AVRO_DEBUG("Checking writer record schema %s", wname);
 
 	avro_consumer_t  **child_resolvers =
 	    (avro_consumer_t **) avro_calloc(wfields, sizeof(avro_consumer_t *));
@@ -1015,7 +1015,7 @@ try_record(avro_memoize_t *mem, avro_resolver_t **resolver,
 		const char  *field_name =
 		    avro_schema_record_field_name(rschema, ri);
 
-		debug("Resolving reader record field %u (%s)", ri, field_name);
+		AVRO_DEBUG("Resolving reader record field %u (%s)", ri, field_name);
 
 		/*
 		 * See if this field is also in the writer schema.
@@ -1030,7 +1030,7 @@ try_record(avro_memoize_t *mem, avro_resolver_t **resolver,
 			 * values!
 			 */
 
-			debug("Field %s isn't in writer", field_name);
+			AVRO_DEBUG("Field %s isn't in writer", field_name);
 			avro_set_error("Reader field %s doesn't appear in writer",
 				       field_name);
 			goto error;
@@ -1055,7 +1055,7 @@ try_record(avro_memoize_t *mem, avro_resolver_t **resolver,
 		 * Save the details for this field.
 		 */
 
-		debug("Found match for field %s (%u in reader, %d in writer)",
+		AVRO_DEBUG("Found match for field %s (%u in reader, %d in writer)",
 		      field_name, ri, wi);
 		child_resolvers[wi] = field_resolver;
 		index_mapping[wi] = ri;
@@ -1114,7 +1114,7 @@ avro_resolver_union_branch(avro_consumer_t *consumer,
 	 * it's NULL, then this branch is incompatible with the reader.
 	 */
 
-	debug("Retrieving resolver for writer branch %u", discriminant);
+	AVRO_DEBUG("Retrieving resolver for writer branch %u", discriminant);
 
 	if (!resolver->child_resolvers[discriminant]) {
 		avro_set_error("Writer union branch %u is incompatible "
@@ -1156,7 +1156,7 @@ try_union(avro_memoize_t *mem, avro_schema_t wschema, avro_schema_t rschema)
 	 */
 
 	size_t  num_branches = avro_schema_union_size(wschema);
-	debug("Checking %" PRIsz "-branch writer union schema", num_branches);
+	AVRO_DEBUG("Checking %" PRIsz "-branch writer union schema", num_branches);
 
 	avro_resolver_t  *resolver = avro_resolver_create(wschema, rschema);
 	avro_memoize_set(mem, wschema, rschema, resolver);
@@ -1170,7 +1170,7 @@ try_union(avro_memoize_t *mem, avro_schema_t wschema, avro_schema_t rschema)
 		avro_schema_t  branch_schema =
 		    avro_schema_union_branch(wschema, i);
 
-		debug("Resolving writer union branch %u (%s)",
+		AVRO_DEBUG("Resolving writer union branch %u (%s)",
 		      i, avro_schema_type_name(branch_schema));
 
 		/*
@@ -1184,10 +1184,10 @@ try_union(avro_memoize_t *mem, avro_schema_t wschema, avro_schema_t rschema)
 		child_resolvers[i] =
 		    avro_resolver_new_memoized(mem, branch_schema, rschema);
 		if (child_resolvers[i]) {
-			debug("Found match for writer union branch %u", i);
+			AVRO_DEBUG("Found match for writer union branch %u", i);
 			some_branch_compatible = 1;
 		} else {
-			debug("No match for writer union branch %u", i);
+			AVRO_DEBUG("No match for writer union branch %u", i);
 		}
 	}
 
@@ -1198,7 +1198,7 @@ try_union(avro_memoize_t *mem, avro_schema_t wschema, avro_schema_t rschema)
 	 */
 
 	if (!some_branch_compatible) {
-		debug("No writer union branches match");
+		AVRO_DEBUG("No writer union branches match");
 		avro_set_error("No branches in the writer are compatible "
 			       "with reader schema %s",
 			       avro_schema_type_name(rschema));
@@ -1250,7 +1250,7 @@ avro_resolver_new_memoized(avro_memoize_t *mem,
 
 	avro_resolver_t  *saved = NULL;
 	if (avro_memoize_get(mem, wschema, rschema, (void **) &saved)) {
-		debug("Already resolved %s and %s",
+		AVRO_DEBUG("Already resolved %s and %s",
 		      avro_schema_type_name(wschema),
 		      avro_schema_type_name(rschema));
 		return &saved->parent;

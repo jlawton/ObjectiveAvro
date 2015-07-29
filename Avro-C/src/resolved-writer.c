@@ -36,13 +36,13 @@
 
 #if AVRO_RESOLVER_DEBUG
 #include <stdio.h>
-#define DEBUG(...) \
+#define AVRO_DEBUG(...) \
 	do { \
 		fprintf(stderr, __VA_ARGS__); \
 		fprintf(stderr, "\n"); \
 	} while (0)
 #else
-#define DEBUG(...)  /* don't print messages */
+#define AVRO_DEBUG(...)  /* don't print messages */
 #endif
 
 
@@ -221,13 +221,13 @@ free_resolver(avro_resolved_writer_t *iface, st_table *freeing)
 {
 	/* First check if we've already started freeing this resolver. */
 	if (st_lookup(freeing, (st_data_t) iface, NULL)) {
-		DEBUG("Already freed %p", iface);
+		AVRO_DEBUG("Already freed %p", iface);
 		return;
 	}
 
 	/* Otherwise add this resolver to the freeing set, then free it. */
 	st_insert(freeing, (st_data_t) iface, (st_data_t) NULL);
-	DEBUG("Freeing resolver %p (%s->%s)", iface,
+	AVRO_DEBUG("Freeing resolver %p (%s->%s)", iface,
 	      avro_schema_type_name(iface->wschema),
 	      avro_schema_type_name(iface->rschema));
 
@@ -240,7 +240,7 @@ avro_resolved_writer_calculate_size_(avro_resolved_writer_t *iface)
 	/* Only calculate the size for any resolver once */
 	iface->calculate_size = NULL;
 
-	DEBUG("Calculating size for %s->%s",
+	AVRO_DEBUG("Calculating size for %s->%s",
 	      avro_schema_type_name((iface)->wschema),
 	      avro_schema_type_name((iface)->rschema));
 	iface->instance_size = sizeof(avro_value_t);
@@ -260,7 +260,7 @@ avro_resolved_writer_decref_iface(avro_value_iface_t *viface)
 {
 	avro_resolved_writer_t  *iface =
 	    container_of(viface, avro_resolved_writer_t, parent);
-	DEBUG("Decref resolver %p (before=%d)", iface, iface->refcount);
+	AVRO_DEBUG("Decref resolver %p (before=%d)", iface, iface->refcount);
 	if (avro_refcount_dec(&iface->refcount)) {
 		avro_resolved_writer_t  *iface =
 		    container_of(viface, avro_resolved_writer_t, parent);
@@ -345,7 +345,7 @@ avro_resolved_writer_get_real_dest(const avro_resolved_writer_t *iface,
 		return 0;
 	}
 
-	DEBUG("Retrieving union branch %d for %s value",
+	AVRO_DEBUG("Retrieving union branch %d for %s value",
 	      iface->reader_union_branch,
 	      avro_schema_type_name(iface->wschema));
 
@@ -399,7 +399,7 @@ do {								\
 	int  rc = check_func(saved, &self, wschema, rschema,	\
 			     rschema);				\
 	if (self) {						\
-		DEBUG("Non-union schemas %s (writer) "		\
+		AVRO_DEBUG("Non-union schemas %s (writer) "		\
 		      "and %s (reader) match",			\
 		      avro_schema_type_name(wschema),		\
 		      avro_schema_type_name(rschema));		\
@@ -428,7 +428,7 @@ do {									\
 		break;							\
 	}								\
 									\
-	DEBUG("Checking reader union schema");				\
+	AVRO_DEBUG("Checking reader union schema");				\
 	size_t  num_branches = avro_schema_union_size(rschema);		\
 	unsigned int  i;						\
 									\
@@ -437,7 +437,7 @@ do {									\
 		    avro_schema_union_branch(rschema, i);		\
 		skip_links(branch_schema);				\
 									\
-		DEBUG("Trying branch %u %s%s%s->%s", i, \
+		AVRO_DEBUG("Trying branch %u %s%s%s->%s", i, \
 		      is_avro_link(wschema)? "[": "", \
 		      avro_schema_type_name(wschema), \
 		      is_avro_link(wschema)? "]": "", \
@@ -447,14 +447,14 @@ do {									\
 		int  rc = check_func(saved, &self,			\
 				     wschema, branch_schema, rschema);	\
 		if (self) {						\
-			DEBUG("Reader union branch %d (%s) "		\
+			AVRO_DEBUG("Reader union branch %d (%s) "		\
 			      "and writer %s match",			\
 			      i, avro_schema_type_name(branch_schema),	\
 			      avro_schema_type_name(wschema));		\
 			self->reader_union_branch = i;			\
 			return self;					\
 		} else {						\
-			DEBUG("Reader union branch %d (%s) "		\
+			AVRO_DEBUG("Reader union branch %d (%s) "		\
 			      "doesn't match",				\
 			      i, avro_schema_type_name(branch_schema));	\
 		}							\
@@ -464,7 +464,7 @@ do {									\
 		}							\
 	}								\
 									\
-	DEBUG("No reader union branches match");			\
+	AVRO_DEBUG("No reader union branches match");			\
 } while (0)
 
 /**
@@ -476,7 +476,7 @@ do {									\
 do {									\
 	check_non_union(saved, wschema, rschema, try_##type_name);	\
 	check_reader_union(saved, wschema, rschema, try_##type_name);	\
-	DEBUG("Writer %s doesn't match reader %s",			\
+	AVRO_DEBUG("Writer %s doesn't match reader %s",			\
 	      avro_schema_type_name(wschema),				\
 	      avro_schema_type_name(rschema));				\
 	avro_set_error("Cannot store " #type_name " into %s",		\
@@ -522,7 +522,7 @@ avro_resolved_link_writer_calculate_size(avro_resolved_writer_t *iface)
 	/* Only calculate the size for any resolver once */
 	iface->calculate_size = NULL;
 
-	DEBUG("Calculating size for [%s]->%s",
+	AVRO_DEBUG("Calculating size for [%s]->%s",
 	      avro_schema_type_name((iface)->wschema),
 	      avro_schema_type_name((iface)->rschema));
 	iface->instance_size = sizeof(avro_resolved_link_value_t);
@@ -555,7 +555,7 @@ avro_resolved_link_writer_init(const avro_resolved_writer_t *iface, void *vself)
 	if (self->target.self == NULL) {
 		return ENOMEM;
 	}
-	DEBUG("Allocated <%p:%" PRIsz "> for link", self->target.self, target_instance_size);
+	AVRO_DEBUG("Allocated <%p:%" PRIsz "> for link", self->target.self, target_instance_size);
 
 	avro_value_t  *target_vself = (avro_value_t *) self->target.self;
 	*target_vself = self->wrapped;
@@ -574,7 +574,7 @@ avro_resolved_link_writer_done(const avro_resolved_writer_t *iface, void *vself)
 	    container_of(iface, avro_resolved_link_writer_t, parent);
 	avro_resolved_link_value_t  *self = (avro_resolved_link_value_t *) vself;
 	size_t  target_instance_size = liface->target_resolver->instance_size;
-	DEBUG("Freeing <%p:%" PRIsz "> for link", self->target.self, target_instance_size);
+	AVRO_DEBUG("Freeing <%p:%" PRIsz "> for link", self->target.self, target_instance_size);
 	avro_resolved_writer_done(liface->target_resolver, self->target.self);
 	avro_free(self->target.self, target_instance_size);
 	self->target.iface = NULL;
@@ -1093,7 +1093,7 @@ try_link(memoize_state_t *state, avro_resolved_writer_t **self,
 		avro_memoize_delete(&state->mem, wschema, root_rschema);
 		avro_value_iface_decref(&lself->parent.parent);
 		avro_prefix_error("Link target isn't compatible: ");
-		DEBUG("%s", avro_strerror());
+		AVRO_DEBUG("%s", avro_strerror());
 		return EINVAL;
 	}
 
@@ -1120,7 +1120,7 @@ avro_resolved_writer_set_boolean(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing %s into %p", val? "TRUE": "FALSE", dest.self);
+	AVRO_DEBUG("Storing %s into %p", val? "TRUE": "FALSE", dest.self);
 	return avro_value_set_boolean(&dest, val);
 }
 
@@ -1152,7 +1152,7 @@ avro_resolved_writer_set_bytes(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing <%p:%" PRIsz "> into %p", buf, size, dest.self);
+	AVRO_DEBUG("Storing <%p:%" PRIsz "> into %p", buf, size, dest.self);
 	return avro_value_set_bytes(&dest, buf, size);
 }
 
@@ -1166,7 +1166,7 @@ avro_resolved_writer_give_bytes(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing [%p] into %p", buf, dest.self);
+	AVRO_DEBUG("Storing [%p] into %p", buf, dest.self);
 	return avro_value_give_bytes(&dest, buf);
 }
 
@@ -1199,7 +1199,7 @@ avro_resolved_writer_set_double(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing %le into %p", val, dest.self);
+	AVRO_DEBUG("Storing %le into %p", val, dest.self);
 	return avro_value_set_double(&dest, val);
 }
 
@@ -1231,7 +1231,7 @@ avro_resolved_writer_set_float(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing %e into %p", val, dest.self);
+	AVRO_DEBUG("Storing %e into %p", val, dest.self);
 	return avro_value_set_float(&dest, val);
 }
 
@@ -1245,7 +1245,7 @@ avro_resolved_writer_set_float_double(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Promoting float %e into double %p", val, dest.self);
+	AVRO_DEBUG("Promoting float %e into double %p", val, dest.self);
 	return avro_value_set_double(&dest, val);
 }
 
@@ -1284,7 +1284,7 @@ avro_resolved_writer_set_int(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing %" PRId32 " into %p", val, dest.self);
+	AVRO_DEBUG("Storing %" PRId32 " into %p", val, dest.self);
 	return avro_value_set_int(&dest, val);
 }
 
@@ -1298,7 +1298,7 @@ avro_resolved_writer_set_int_double(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Promoting int %" PRId32 " into double %p", val, dest.self);
+	AVRO_DEBUG("Promoting int %" PRId32 " into double %p", val, dest.self);
 	return avro_value_set_double(&dest, val);
 }
 
@@ -1312,7 +1312,7 @@ avro_resolved_writer_set_int_float(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Promoting int %" PRId32 " into float %p", val, dest.self);
+	AVRO_DEBUG("Promoting int %" PRId32 " into float %p", val, dest.self);
 	return avro_value_set_float(&dest, (float) val);
 }
 
@@ -1326,7 +1326,7 @@ avro_resolved_writer_set_int_long(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Promoting int %" PRId32 " into long %p", val, dest.self);
+	AVRO_DEBUG("Promoting int %" PRId32 " into long %p", val, dest.self);
 	return avro_value_set_long(&dest, val);
 }
 
@@ -1377,7 +1377,7 @@ avro_resolved_writer_set_long(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing %" PRId64 " into %p", val, dest.self);
+	AVRO_DEBUG("Storing %" PRId64 " into %p", val, dest.self);
 	return avro_value_set_long(&dest, val);
 }
 
@@ -1391,7 +1391,7 @@ avro_resolved_writer_set_long_double(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Promoting long %" PRId64 " into double %p", val, dest.self);
+	AVRO_DEBUG("Promoting long %" PRId64 " into double %p", val, dest.self);
 	return avro_value_set_double(&dest, (double) val);
 }
 
@@ -1405,7 +1405,7 @@ avro_resolved_writer_set_long_float(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Promoting long %" PRId64 " into float %p", val, dest.self);
+	AVRO_DEBUG("Promoting long %" PRId64 " into float %p", val, dest.self);
 	return avro_value_set_float(&dest, (float) val);
 }
 
@@ -1450,7 +1450,7 @@ avro_resolved_writer_set_null(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing NULL into %p", dest.self);
+	AVRO_DEBUG("Storing NULL into %p", dest.self);
 	return avro_value_set_null(&dest);
 }
 
@@ -1482,7 +1482,7 @@ avro_resolved_writer_set_string(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing \"%s\" into %p", str, dest.self);
+	AVRO_DEBUG("Storing \"%s\" into %p", str, dest.self);
 	return avro_value_set_string(&dest, str);
 }
 
@@ -1496,7 +1496,7 @@ avro_resolved_writer_set_string_len(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing <%p:%" PRIsz "> into %p", str, size, dest.self);
+	AVRO_DEBUG("Storing <%p:%" PRIsz "> into %p", str, size, dest.self);
 	return avro_value_set_string_len(&dest, str, size);
 }
 
@@ -1510,7 +1510,7 @@ avro_resolved_writer_give_string_len(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing [%p] into %p", buf, dest.self);
+	AVRO_DEBUG("Storing [%p] into %p", buf, dest.self);
 	return avro_value_give_string_len(&dest, buf);
 }
 
@@ -1553,7 +1553,7 @@ avro_resolved_array_writer_calculate_size(avro_resolved_writer_t *iface)
 	/* Only calculate the size for any resolver once */
 	iface->calculate_size = NULL;
 
-	DEBUG("Calculating size for %s->%s",
+	AVRO_DEBUG("Calculating size for %s->%s",
 	      avro_schema_type_name((iface)->wschema),
 	      avro_schema_type_name((iface)->rschema));
 	iface->instance_size = sizeof(avro_resolved_array_value_t);
@@ -1579,7 +1579,7 @@ avro_resolved_array_writer_init(const avro_resolved_writer_t *iface, void *vself
 	    container_of(iface, avro_resolved_array_writer_t, parent);
 	avro_resolved_array_value_t  *self = (avro_resolved_array_value_t *) vself;
 	size_t  child_instance_size = aiface->child_resolver->instance_size;
-	DEBUG("Initializing child array (child_size=%" PRIsz ")", child_instance_size);
+	AVRO_DEBUG("Initializing child array (child_size=%" PRIsz ")", child_instance_size);
 	avro_raw_array_init(&self->children, child_instance_size);
 	return 0;
 }
@@ -1652,7 +1652,7 @@ avro_resolved_array_writer_append(const avro_value_iface_t *viface,
 		return ENOMEM;
 	}
 
-	DEBUG("Appending to array %p", dest.self);
+	AVRO_DEBUG("Appending to array %p", dest.self);
 	check(rval, avro_value_append(&dest, (avro_value_t *) child_out->self, new_index));
 	return avro_resolved_writer_init(aiface->child_resolver, child_out->self);
 }
@@ -1745,7 +1745,7 @@ avro_resolved_writer_set_enum(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing %d into %p", val, dest.self);
+	AVRO_DEBUG("Storing %d into %p", val, dest.self);
 	return avro_value_set_enum(&dest, val);
 }
 
@@ -1787,7 +1787,7 @@ avro_resolved_writer_set_fixed(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing <%p:%" PRIsz "> into (fixed) %p", buf, size, dest.self);
+	AVRO_DEBUG("Storing <%p:%" PRIsz "> into (fixed) %p", buf, size, dest.self);
 	return avro_value_set_fixed(&dest, buf, size);
 }
 
@@ -1801,7 +1801,7 @@ avro_resolved_writer_give_fixed(const avro_value_iface_t *viface,
 	avro_value_t  *self = (avro_value_t *) vself;
 	avro_value_t  dest;
 	check(rval, avro_resolved_writer_get_real_dest(iface, self, &dest));
-	DEBUG("Storing [%p] into (fixed) %p", buf, dest.self);
+	AVRO_DEBUG("Storing [%p] into (fixed) %p", buf, dest.self);
 	return avro_value_give_fixed(&dest, buf);
 }
 
@@ -1847,7 +1847,7 @@ avro_resolved_map_writer_calculate_size(avro_resolved_writer_t *iface)
 	/* Only calculate the size for any resolver once */
 	iface->calculate_size = NULL;
 
-	DEBUG("Calculating size for %s->%s",
+	AVRO_DEBUG("Calculating size for %s->%s",
 	      avro_schema_type_name((iface)->wschema),
 	      avro_schema_type_name((iface)->rschema));
 	iface->instance_size = sizeof(avro_resolved_map_value_t);
@@ -1873,7 +1873,7 @@ avro_resolved_map_writer_init(const avro_resolved_writer_t *iface, void *vself)
 	    container_of(iface, avro_resolved_map_writer_t, parent);
 	avro_resolved_map_value_t  *self = (avro_resolved_map_value_t *) vself;
 	size_t  child_instance_size = miface->child_resolver->instance_size;
-	DEBUG("Initializing child array for map (child_size=%" PRIsz ")", child_instance_size);
+	AVRO_DEBUG("Initializing child array for map (child_size=%" PRIsz ")", child_instance_size);
 	avro_raw_array_init(&self->children, child_instance_size);
 	return 0;
 }
@@ -1950,13 +1950,13 @@ avro_resolved_map_writer_add(const avro_value_iface_t *viface,
 	size_t  real_index;
 	int  real_is_new;
 
-	DEBUG("Adding %s to map %p", key, dest.self);
+	AVRO_DEBUG("Adding %s to map %p", key, dest.self);
 	check(rval, avro_value_add(&dest, key, &real_child, &real_index, &real_is_new));
 
 	child->iface = &miface->child_resolver->parent;
 	if (real_is_new) {
 		child->self = avro_raw_array_append(&self->children);
-		DEBUG("Element is new (child resolver=%p)", child->self);
+		AVRO_DEBUG("Element is new (child resolver=%p)", child->self);
 		if (child->self == NULL) {
 			avro_set_error("Couldn't expand map");
 			return ENOMEM;
@@ -1965,7 +1965,7 @@ avro_resolved_map_writer_add(const avro_value_iface_t *viface,
 		      (miface->child_resolver, child->self));
 	} else {
 		child->self = avro_raw_array_get_raw(&self->children, real_index);
-		DEBUG("Element is old (child resolver=%p)", child->self);
+		AVRO_DEBUG("Element is old (child resolver=%p)", child->self);
 	}
 	avro_value_t  *child_vself = (avro_value_t *) child->self;
 	*child_vself = real_child;
@@ -2085,7 +2085,7 @@ avro_resolved_record_writer_calculate_size(avro_resolved_writer_t *iface)
 	/* Only calculate the size for any resolver once */
 	iface->calculate_size = NULL;
 
-	DEBUG("Calculating size for %s->%s",
+	AVRO_DEBUG("Calculating size for %s->%s",
 	      avro_schema_type_name((iface)->wschema),
 	      avro_schema_type_name((iface)->rschema));
 
@@ -2103,14 +2103,14 @@ avro_resolved_record_writer_calculate_size(avro_resolved_writer_t *iface)
 			    (riface->field_resolvers[wi]);
 			size_t  field_size =
 			    riface->field_resolvers[wi]->instance_size;
-			DEBUG("Field %" PRIsz " has size %" PRIsz, wi, field_size);
+			AVRO_DEBUG("Field %" PRIsz " has size %" PRIsz, wi, field_size);
 			next_offset += field_size;
 		} else {
-			DEBUG("Field %" PRIsz " is being skipped", wi);
+			AVRO_DEBUG("Field %" PRIsz " is being skipped", wi);
 		}
 	}
 
-	DEBUG("Record has size %" PRIsz, next_offset);
+	AVRO_DEBUG("Record has size %" PRIsz, next_offset);
 	iface->instance_size = next_offset;
 }
 
@@ -2129,7 +2129,7 @@ avro_resolved_record_writer_free_iface(avro_resolved_writer_t *iface, st_table *
 		size_t  i;
 		for (i = 0; i < riface->field_count; i++) {
 			if (riface->field_resolvers[i] != NULL) {
-				DEBUG("Freeing field %" PRIsz " %p", i,
+				AVRO_DEBUG("Freeing field %" PRIsz " %p", i,
 				      riface->field_resolvers[i]);
 				free_resolver(riface->field_resolvers[i], freeing);
 			}
@@ -2234,9 +2234,9 @@ avro_resolved_record_writer_get_by_index(const avro_value_iface_t *viface,
 	const avro_resolved_record_value_t  *self = (const avro_resolved_record_value_t *) vself;
 	avro_value_t  dest;
 
-	DEBUG("Getting writer field %" PRIsz " from record %p", index, self);
+	AVRO_DEBUG("Getting writer field %" PRIsz " from record %p", index, self);
 	if (riface->field_resolvers[index] == NULL) {
-		DEBUG("Reader doesn't have field, skipping");
+		AVRO_DEBUG("Reader doesn't have field, skipping");
 		child->iface = NULL;
 		child->self = NULL;
 		return 0;
@@ -2244,7 +2244,7 @@ avro_resolved_record_writer_get_by_index(const avro_value_iface_t *viface,
 
 	check(rval, avro_resolved_writer_get_real_dest(iface, &self->wrapped, &dest));
 	size_t  reader_index = riface->index_mapping[index];
-	DEBUG("  Reader field is %" PRIsz, reader_index);
+	AVRO_DEBUG("  Reader field is %" PRIsz, reader_index);
 	child->iface = &riface->field_resolvers[index]->parent;
 	child->self = avro_resolved_record_field(riface, self, index);
 
@@ -2265,7 +2265,7 @@ avro_resolved_record_writer_get_by_name(const avro_value_iface_t *viface,
 		return EINVAL;
 	}
 
-	DEBUG("Writer field %s is at index %d", name, wi);
+	AVRO_DEBUG("Writer field %s is at index %d", name, wi);
 	if (index != NULL) {
 		*index = wi;
 	}
@@ -2348,7 +2348,7 @@ try_record(memoize_state_t *state, avro_resolved_writer_t **self,
 	size_t  wfields = avro_schema_record_size(wschema);
 	size_t  rfields = avro_schema_record_size(rschema);
 
-	DEBUG("Checking writer record schema %s", wname);
+	AVRO_DEBUG("Checking writer record schema %s", wname);
 
 	avro_resolved_writer_t  **field_resolvers =
 	    (avro_resolved_writer_t **) avro_calloc(wfields, sizeof(avro_resolved_writer_t *));
@@ -2362,7 +2362,7 @@ try_record(memoize_state_t *state, avro_resolved_writer_t **self,
 		const char  *field_name =
 		    avro_schema_record_field_name(rschema, ri);
 
-		DEBUG("Resolving reader record field %" PRIsz " (%s)", ri, field_name);
+		AVRO_DEBUG("Resolving reader record field %" PRIsz " (%s)", ri, field_name);
 
 		/*
 		 * See if this field is also in the writer schema.
@@ -2377,7 +2377,7 @@ try_record(memoize_state_t *state, avro_resolved_writer_t **self,
 			 * values!
 			 */
 
-			DEBUG("Field %s isn't in writer", field_name);
+			AVRO_DEBUG("Field %s isn't in writer", field_name);
 
 			/* Allow missing fields in the writer. They
 			 * will default to zero. So skip over the
@@ -2416,7 +2416,7 @@ try_record(memoize_state_t *state, avro_resolved_writer_t **self,
 		 * Save the details for this field.
 		 */
 
-		DEBUG("Found match for field %s (%" PRIsz " in reader, %d in writer)",
+		AVRO_DEBUG("Found match for field %s (%" PRIsz " in reader, %d in writer)",
 		      field_name, ri, wi);
 		field_resolvers[wi] = field_resolver;
 		index_mapping[wi] = ri;
@@ -2493,7 +2493,7 @@ avro_resolved_union_writer_calculate_size(avro_resolved_writer_t *iface)
 	/* Only calculate the size for any resolver once */
 	iface->calculate_size = NULL;
 
-	DEBUG("Calculating size for %s->%s",
+	AVRO_DEBUG("Calculating size for %s->%s",
 	      avro_schema_type_name((iface)->wschema),
 	      avro_schema_type_name((iface)->rschema));
 
@@ -2501,23 +2501,23 @@ avro_resolved_union_writer_calculate_size(avro_resolved_writer_t *iface)
 	size_t  max_branch_size = 0;
 	for (i = 0; i < uiface->branch_count; i++) {
 		if (uiface->branch_resolvers[i] == NULL) {
-			DEBUG("No match for writer union branch %" PRIsz, i);
+			AVRO_DEBUG("No match for writer union branch %" PRIsz, i);
 		} else {
 			avro_resolved_writer_calculate_size
 			    (uiface->branch_resolvers[i]);
 			size_t  branch_size =
 			    uiface->branch_resolvers[i]->instance_size;
-			DEBUG("Writer branch %" PRIsz " has size %" PRIsz, i, branch_size);
+			AVRO_DEBUG("Writer branch %" PRIsz " has size %" PRIsz, i, branch_size);
 			if (branch_size > max_branch_size) {
 				max_branch_size = branch_size;
 			}
 		}
 	}
 
-	DEBUG("Maximum branch size is %" PRIsz, max_branch_size);
+	AVRO_DEBUG("Maximum branch size is %" PRIsz, max_branch_size);
 	iface->instance_size =
 	    sizeof(avro_resolved_union_value_t) + max_branch_size;
-	DEBUG("Total union size is %" PRIsz, iface->instance_size);
+	AVRO_DEBUG("Total union size is %" PRIsz, iface->instance_size);
 }
 
 static void
@@ -2595,11 +2595,11 @@ avro_resolved_union_writer_set_branch(const avro_value_iface_t *viface,
 	    container_of(iface, avro_resolved_union_writer_t, parent);
 	avro_resolved_union_value_t  *self = (avro_resolved_union_value_t *) vself;
 
-	DEBUG("Getting writer branch %d from union %p", discriminant, vself);
+	AVRO_DEBUG("Getting writer branch %d from union %p", discriminant, vself);
 	avro_resolved_writer_t  *branch_resolver =
 	    uiface->branch_resolvers[discriminant];
 	if (branch_resolver == NULL) {
-		DEBUG("Reader doesn't have branch, skipping");
+		AVRO_DEBUG("Reader doesn't have branch, skipping");
 		avro_set_error("Writer union branch %d is incompatible "
 			       "with reader schema \"%s\"",
 			       discriminant, avro_schema_type_name(iface->rschema));
@@ -2607,15 +2607,15 @@ avro_resolved_union_writer_set_branch(const avro_value_iface_t *viface,
 	}
 
 	if (self->discriminant == discriminant) {
-		DEBUG("Writer branch %d already selected", discriminant);
+		AVRO_DEBUG("Writer branch %d already selected", discriminant);
 	} else {
 		if (self->discriminant >= 0) {
-			DEBUG("Finalizing old writer branch %d", self->discriminant);
+			AVRO_DEBUG("Finalizing old writer branch %d", self->discriminant);
 			avro_resolved_writer_done
 			    (uiface->branch_resolvers[self->discriminant],
 			     avro_resolved_union_branch(self));
 		}
-		DEBUG("Initializing writer branch %d", discriminant);
+		AVRO_DEBUG("Initializing writer branch %d", discriminant);
 		check(rval, avro_resolved_writer_init
 		      (uiface->branch_resolvers[discriminant],
 		       avro_resolved_union_branch(self)));
@@ -2681,7 +2681,7 @@ try_union(memoize_state_t *state,
 	 */
 
 	size_t  branch_count = avro_schema_union_size(wschema);
-	DEBUG("Checking %" PRIsz "-branch writer union schema", branch_count);
+	AVRO_DEBUG("Checking %" PRIsz "-branch writer union schema", branch_count);
 
 	avro_resolved_union_writer_t  *uself =
 	    avro_resolved_union_writer_create(wschema, rschema);
@@ -2696,7 +2696,7 @@ try_union(memoize_state_t *state,
 		avro_schema_t  branch_schema =
 		    avro_schema_union_branch(wschema, i);
 
-		DEBUG("Resolving writer union branch %" PRIsz " (%s)", i,
+		AVRO_DEBUG("Resolving writer union branch %" PRIsz " (%s)", i,
 		      avro_schema_type_name(branch_schema));
 
 		/*
@@ -2710,9 +2710,9 @@ try_union(memoize_state_t *state,
 		branch_resolvers[i] =
 		    avro_resolved_writer_new_memoized(state, branch_schema, rschema);
 		if (branch_resolvers[i] == NULL) {
-			DEBUG("No match for writer union branch %" PRIsz, i);
+			AVRO_DEBUG("No match for writer union branch %" PRIsz, i);
 		} else {
-			DEBUG("Found match for writer union branch %" PRIsz, i);
+			AVRO_DEBUG("Found match for writer union branch %" PRIsz, i);
 			some_branch_compatible = 1;
 		}
 	}
@@ -2724,7 +2724,7 @@ try_union(memoize_state_t *state,
 	 */
 
 	if (!some_branch_compatible) {
-		DEBUG("No writer union branches match");
+		AVRO_DEBUG("No writer union branches match");
 		avro_set_error("No branches in the writer are compatible "
 			       "with reader schema %s",
 			       avro_schema_type_name(rschema));
@@ -2777,7 +2777,7 @@ avro_resolved_writer_new_memoized(memoize_state_t *state,
 
 	avro_resolved_writer_t  *saved = NULL;
 	if (avro_memoize_get(&state->mem, wschema, rschema, (void **) &saved)) {
-		DEBUG("Already resolved %s%s%s->%s",
+		AVRO_DEBUG("Already resolved %s%s%s->%s",
 		      is_avro_link(wschema)? "[": "",
 		      avro_schema_type_name(wschema),
 		      is_avro_link(wschema)? "]": "",
@@ -2785,7 +2785,7 @@ avro_resolved_writer_new_memoized(memoize_state_t *state,
 		avro_value_iface_incref(&saved->parent);
 		return saved;
 	} else {
-		DEBUG("Resolving %s%s%s->%s",
+		AVRO_DEBUG("Resolving %s%s%s->%s",
 		      is_avro_link(wschema)? "[": "",
 		      avro_schema_type_name(wschema),
 		      is_avro_link(wschema)? "]": "",

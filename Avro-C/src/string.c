@@ -30,13 +30,13 @@
 
 #if AVRO_STRING_DEBUG
 #include <stdio.h>
-#define DEBUG(...) \
+#define AVRO_DEBUG(...) \
 	do { \
 		fprintf(stderr, __VA_ARGS__); \
 		fprintf(stderr, "\n"); \
 	} while (0)
 #else
-#define DEBUG(...)  /* don't print messages */
+#define AVRO_DEBUG(...)  /* don't print messages */
 #endif
 
 
@@ -58,7 +58,7 @@ struct avro_wrapped_resizable {
 static void
 avro_wrapped_resizable_free(avro_wrapped_buffer_t *self)
 {
-	DEBUG("--- Freeing resizable <%p:%" PRIsz "> (%p)", self->buf, self->size, self->user_data);
+	AVRO_DEBUG("--- Freeing resizable <%p:%" PRIsz "> (%p)", self->buf, self->size, self->user_data);
 	struct avro_wrapped_resizable  *resizable = (struct avro_wrapped_resizable *) self->user_data;
 	avro_free(resizable, avro_wrapped_resizable_size(resizable->buf_size));
 }
@@ -82,7 +82,7 @@ avro_wrapped_resizable_resize(avro_wrapped_buffer_t *self, size_t desired)
 		new_buf_size = desired;
 	}
 
-	DEBUG("--- Resizing <%p:%" PRIsz "> (%p) -> %" PRIsz,
+	AVRO_DEBUG("--- Resizing <%p:%" PRIsz "> (%p) -> %" PRIsz,
 	      self->buf, self->buf_size, self->user_data, new_buf_size);
 
 	struct avro_wrapped_resizable  *new_resizable =
@@ -92,7 +92,7 @@ avro_wrapped_resizable_resize(avro_wrapped_buffer_t *self, size_t desired)
 	if (new_resizable == NULL) {
 		return ENOMEM;
 	}
-	DEBUG("--- New buffer <%p:%" PRIsz ">", new_buf, new_buf_size);
+	AVRO_DEBUG("--- New buffer <%p:%" PRIsz ">", new_buf, new_buf_size);
 
 	new_resizable->buf_size = new_buf_size;
 
@@ -100,10 +100,10 @@ avro_wrapped_resizable_resize(avro_wrapped_buffer_t *self, size_t desired)
 	char  *new_buf = (char *) new_resizable;
 
 	ptrdiff_t  offset = (char *) self->buf - old_buf;
-	DEBUG("--- Old data pointer is %p", self->buf);
+	AVRO_DEBUG("--- Old data pointer is %p", self->buf);
 	self->buf = new_buf + offset;
 	self->user_data = new_resizable;
-	DEBUG("--- New data pointer is %p", self->buf);
+	AVRO_DEBUG("--- New data pointer is %p", self->buf);
 	return 0;
 }
 
@@ -120,7 +120,7 @@ avro_wrapped_resizable_new(avro_wrapped_buffer_t *dest, size_t buf_size)
 	resizable->buf_size = buf_size;
 
 	dest->buf = ((char *) resizable) + sizeof(struct avro_wrapped_resizable);
-	DEBUG("--- Creating resizable <%p:%" PRIsz "> (%p)", dest->buf, buf_size, resizable);
+	AVRO_DEBUG("--- Creating resizable <%p:%" PRIsz "> (%p)", dest->buf, buf_size, resizable);
 	dest->size = buf_size;
 	dest->user_data = resizable;
 	dest->free = avro_wrapped_resizable_free;
@@ -151,10 +151,10 @@ avro_raw_string_clear(avro_raw_string_t *str)
 	 */
 
 	if (is_resizable(str->wrapped)) {
-		DEBUG("--- Clearing resizable buffer");
+		AVRO_DEBUG("--- Clearing resizable buffer");
 		str->wrapped.size = 0;
 	} else {
-		DEBUG("--- Freeing wrapped buffer");
+		AVRO_DEBUG("--- Freeing wrapped buffer");
 		avro_wrapped_buffer_free(&str->wrapped);
 		avro_raw_string_init(str);
 	}
@@ -180,7 +180,7 @@ avro_raw_string_ensure_buf(avro_raw_string_t *str, size_t length)
 {
 	int  rval;
 
-	DEBUG("--- Ensuring resizable buffer of size %" PRIsz, length);
+	AVRO_DEBUG("--- Ensuring resizable buffer of size %" PRIsz, length);
 	if (is_resizable(str->wrapped)) {
 		/*
 		 * If we've already got a resizable buffer, just have it
@@ -269,7 +269,7 @@ void
 avro_raw_string_give(avro_raw_string_t *str,
 		     avro_wrapped_buffer_t *src)
 {
-	DEBUG("--- Giving control of <%p:%" PRIsz "> (%p) to string",
+	AVRO_DEBUG("--- Giving control of <%p:%" PRIsz "> (%p) to string",
 	      src->buf, src->size, src);
 	avro_wrapped_buffer_free(&str->wrapped);
 	avro_wrapped_buffer_move(&str->wrapped, src);
