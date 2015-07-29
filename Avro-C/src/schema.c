@@ -795,7 +795,7 @@ avro_schema_from_json_t(json_t *json, avro_schema_t *schema,
 #ifdef _WIN32
  #pragma message("#warning: Bug: '0' is not of type avro_type_t.")
 #else
- #warning "Bug: '0' is not of type avro_type_t."
+// #warning "Bug: '0' is not of type avro_type_t."
 #endif
   /* We should really have an "AVRO_INVALID" type in
    * avro_type_t. Suppress warning below in which we set type to 0.

@@ -262,7 +262,7 @@
     } else if ([type isEqualToString:@"null"]) {
         value = avro_null();
     } else if ([type isEqualToString:@"bytes"]) {
-        char *str = [values cStringUsingEncoding:NSUTF8StringEncoding];
+        const char *str = [values cStringUsingEncoding:NSUTF8StringEncoding];
         value = avro_bytes(str, strlen(str) + 1);
     } else if ([type isEqualToString:@"map"]) {
         

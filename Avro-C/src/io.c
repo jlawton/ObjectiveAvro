@@ -255,9 +255,6 @@ avro_read_file(struct _avro_reader_file_t *reader, void *buf, int64_t len)
 		reader->cur += needed;
 		return 0;
 	}
-	avro_set_error("Cannot read %" PRIsz " bytes from file",
-		       (size_t) needed);
-	return EILSEQ;
 }
 
 int avro_read(avro_reader_t reader, void *buf, int64_t len)

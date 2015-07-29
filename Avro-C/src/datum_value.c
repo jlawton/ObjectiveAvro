@@ -83,7 +83,7 @@ avro_datum_value_get_type(const avro_value_iface_t *iface, const void *vself)
 #ifdef _WIN32
 #pragma message("#warning: Bug: EINVAL is not of type avro_type_t.")
 #else
-#warning "Bug: EINVAL is not of type avro_type_t."
+//#warning "Bug: EINVAL is not of type avro_type_t."
 #endif
         /* We shouldn't use EINVAL as the return value to
          * check_param(), because EINVAL (= 22) is not a valid enum

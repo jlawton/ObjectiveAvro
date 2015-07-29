@@ -250,8 +250,8 @@ static int file_read_header(avro_reader_t reader,
 	char magic[4];
 	avro_value_t codec_val;
 	avro_value_t schema_bytes;
-	const void *p;
-	size_t len;
+	const void *p = NULL;
+	size_t len = 0;
 
 	check(rval, avro_read(reader, magic, sizeof(magic)));
 	if (magic[0] != 'O' || magic[1] != 'b' || magic[2] != 'j'
@@ -283,7 +283,7 @@ static int file_read_header(avro_reader_t reader,
 		}
 	} else {
 		const void *buf;
-		size_t size;
+		size_t size = 0;
 		char codec_name[11];
 
 		avro_type_t type = avro_value_get_type(&codec_val);
@@ -296,7 +296,9 @@ static int file_read_header(avro_reader_t reader,
 
 		avro_value_get_bytes(&codec_val, &buf, &size);
 		memset(codec_name, 0, sizeof(codec_name));
-		strncpy(codec_name, (const char *) buf, size < 10 ? size : 10);
+        if (size) {
+            strncpy(codec_name, (const char *) buf, size < 10 ? size : 10);
+        }
 
 		if (avro_codec(codec, codec_name) != 0) {
 			avro_set_error("File header contains an unknown codec");
