@@ -6,6 +6,4 @@
 //  Copyright (c) 2015 James Lawton. All rights reserved.
 //
 
-@import Foundation
-
 #import <ObjectiveAvro/OAVAvroSerialization.h>
