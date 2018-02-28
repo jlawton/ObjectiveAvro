@@ -217,7 +217,13 @@
     
     
     if ([name isKindOfClass:[NSDictionary class]]) {
-        if ([name[@"type"] isEqual:@"array"]) {
+        if ([name[@"type"] isKindOfClass:[NSArray class]]) {    // union
+            avro_schema_t schema = avro_schema_union();
+            for (id type in name[@"type"]) {
+                avro_schema_union_append(schema, [self schemaFromName:type]);
+            }
+            return schema;
+        } else if ([name[@"type"] isEqual:@"array"]) {  // array
             avro_schema_t schema = [self schemaFromName:name[@"items"][@"name"]];
             return avro_schema_array(schema);
         }
@@ -246,8 +252,31 @@
         type = schema[@"type"];
         name = schema[@"name"];
     }
+
+    // defaults
+    if (([values isKindOfClass:[NSNull class]] || values == nil)
+        && schema[@"default"] != nil
+        && schema[@"default"] != values) {
+        return [self valueForSchema:schema values:schema[@"default"]];
+    }
     
-    if ([type isEqualToString:@"string"]) {
+    // union types
+    if ([type isKindOfClass:[NSArray class]]) {
+        NSMutableDictionary *unionSchema = [schema mutableCopy];
+        
+        for (id unionType in [(NSArray *)type reverseObjectEnumerator]) {
+            unionSchema[@"type"] = unionType;
+            avro_datum_t unionValue = [self valueForSchema:unionSchema values:values];
+            if (unionValue != nil) {
+                value = avro_union([self schemaFromName:schema],
+                                   [(NSArray *)type indexOfObject:unionType],
+                                   unionValue);
+                return value;
+            }
+        }
+    }
+    
+    if ([type isEqualToString:@"string"] && [values isKindOfClass:[NSString class]]) {
         value = avro_string([values cStringUsingEncoding:NSUTF8StringEncoding]);
     } else if ([type isEqualToString:@"float"]) {
         value = avro_float([values floatValue]);
@@ -261,7 +290,7 @@
         value = avro_boolean([values boolValue]);
     } else if ([type isEqualToString:@"null"]) {
         value = avro_null();
-    } else if ([type isEqualToString:@"bytes"]) {
+    } else if ([type isEqualToString:@"bytes"] && [values isKindOfClass:[NSString class]]) {
         const char *str = [values cStringUsingEncoding:NSUTF8StringEncoding];
         value = avro_bytes(str, strlen(str) + 1);
     } else if ([type isEqualToString:@"map"]) {

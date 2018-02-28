@@ -395,4 +395,49 @@
     expect(bytesFromAvro).to.equal(bytes);
 }
 
+- (void)testUnionType {
+    NSString *schema = @"{\"type\":\"record\",\"name\":\"UnionTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"null\", \"string\"],  \"default\": null}]}";
+    
+    OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
+    [avro registerSchema:schema error:NULL];
+    
+    
+    NSError *error;
+    NSData *data = [avro dataFromJSONObject:@{@"union_value": [NSNull null]} forSchemaNamed:@"UnionTest" error:&error];
+    expect(error).to.beNil();
+    expect(data).toNot.beNil();
+    
+    id nullFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"UnionTest" error:&error][@"union_value"];
+    
+    expect(error).to.beNil();
+    expect(nullFromAvro).to.equal([NSNull null]);
+    
+    data = [avro dataFromJSONObject:@{@"union_value": @"Tibet"} forSchemaNamed:@"UnionTest" error:&error];
+    expect(error).to.beNil();
+    expect(data).toNot.beNil();
+    
+    id stringFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"UnionTest" error:&error][@"union_value"];
+    
+    expect(error).to.beNil();
+    expect(stringFromAvro).to.equal(@{@"string": @"Tibet"});
+}
+
+- (void)testDefault {
+    NSString *schema = @"{\"type\":\"record\",\"name\":\"UnionTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"null\", \"string\"], \"default\": null}, {\"name\":\"no_default\",\"type\":\"string\"}]}";
+    
+    OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
+    [avro registerSchema:schema error:NULL];
+    
+    
+    NSError *error;
+    NSData *data = [avro dataFromJSONObject:@{@"no_default": @"hey"} forSchemaNamed:@"UnionTest" error:&error];
+    expect(error).to.beNil();
+    expect(data).toNot.beNil();
+    
+    id nullFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"UnionTest" error:&error][@"union_value"];
+    
+    expect(error).to.beNil();
+    expect(nullFromAvro).to.equal([NSNull null]);
+}
+
 @end
