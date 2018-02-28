@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		245325EB28824D6A886A50C3 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 078BCDBD35B242F89119581D /* libPods.a */; };
 		D476EB8618D332AB0060579C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D476EB8518D332AB0060579C /* Foundation.framework */; };
 		D476EB8818D332AB0060579C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D476EB8718D332AB0060579C /* CoreGraphics.framework */; };
 		D476EB8A18D332AB0060579C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D476EB8918D332AB0060579C /* UIKit.framework */; };
@@ -22,7 +21,6 @@
 		D476EBA718D332AB0060579C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D476EB8918D332AB0060579C /* UIKit.framework */; };
 		D476EBAF18D332AB0060579C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D476EBAD18D332AB0060579C /* InfoPlist.strings */; };
 		D476EBB118D332AB0060579C /* ObjectiveAvroTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D476EBB018D332AB0060579C /* ObjectiveAvroTests.m */; };
-		D476EBBD18D33EDF0060579C /* person_schema.json in Resources */ = {isa = PBXBuildFile; fileRef = D476EBBA18D33EDF0060579C /* person_schema.json */; };
 		D476EBBE18D33EDF0060579C /* people_schema.json in Resources */ = {isa = PBXBuildFile; fileRef = D476EBBB18D33EDF0060579C /* people_schema.json */; };
 		D476EBBF18D33EDF0060579C /* people.json in Resources */ = {isa = PBXBuildFile; fileRef = D476EBBC18D33EDF0060579C /* people.json */; };
 		E9DC513D5C22400AB51FEB38 /* libPods-ObjectiveAvroTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0E574D9328F40B4AABF86A6 /* libPods-ObjectiveAvroTests.a */; };
@@ -40,6 +38,9 @@
 
 /* Begin PBXFileReference section */
 		078BCDBD35B242F89119581D /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		361896E12B93748B02D76DD0 /* Pods-ObjectiveAvroTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectiveAvroTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ObjectiveAvroTests/Pods-ObjectiveAvroTests.debug.xcconfig"; sourceTree = "<group>"; };
+		50E5EAA33596824F4E023579 /* Pods-ObjectiveAvroTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectiveAvroTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ObjectiveAvroTests/Pods-ObjectiveAvroTests.release.xcconfig"; sourceTree = "<group>"; };
+		6B16B29220473FD3004276D5 /* person_schema.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = person_schema.json; path = ../ObjectiveAvro/person_schema.json; sourceTree = "<group>"; };
 		A0E574D9328F40B4AABF86A6 /* libPods-ObjectiveAvroTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ObjectiveAvroTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D476EB8218D332AB0060579C /* ObjectiveAvro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ObjectiveAvro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D476EB8518D332AB0060579C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -60,11 +61,9 @@
 		D476EBAC18D332AB0060579C /* ObjectiveAvroTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ObjectiveAvroTests-Info.plist"; sourceTree = "<group>"; };
 		D476EBAE18D332AB0060579C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D476EBB018D332AB0060579C /* ObjectiveAvroTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjectiveAvroTests.m; sourceTree = "<group>"; };
-		D476EBBA18D33EDF0060579C /* person_schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person_schema.json; sourceTree = "<group>"; };
 		D476EBBB18D33EDF0060579C /* people_schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = people_schema.json; sourceTree = "<group>"; };
 		D476EBBC18D33EDF0060579C /* people.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = people.json; sourceTree = "<group>"; };
 		E41214375EEC429981B0AEFF /* Pods-ObjectiveAvroTests.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectiveAvroTests.xcconfig"; path = "Pods/Pods-ObjectiveAvroTests.xcconfig"; sourceTree = "<group>"; };
-		F3AECFDA32714A7CA977D06E /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,7 +74,6 @@
 				D476EB8818D332AB0060579C /* CoreGraphics.framework in Frameworks */,
 				D476EB8A18D332AB0060579C /* UIKit.framework in Frameworks */,
 				D476EB8618D332AB0060579C /* Foundation.framework in Frameworks */,
-				245325EB28824D6A886A50C3 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +91,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A2E120F9EB7C589127767764 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				361896E12B93748B02D76DD0 /* Pods-ObjectiveAvroTests.debug.xcconfig */,
+				50E5EAA33596824F4E023579 /* Pods-ObjectiveAvroTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		D476EB7918D332AB0060579C = {
 			isa = PBXGroup;
 			children = (
@@ -100,8 +107,8 @@
 				D476EBAA18D332AB0060579C /* ObjectiveAvroTests */,
 				D476EB8418D332AB0060579C /* Frameworks */,
 				D476EB8318D332AB0060579C /* Products */,
-				F3AECFDA32714A7CA977D06E /* Pods.xcconfig */,
 				E41214375EEC429981B0AEFF /* Pods-ObjectiveAvroTests.xcconfig */,
+				A2E120F9EB7C589127767764 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -155,7 +162,7 @@
 		D476EBAA18D332AB0060579C /* ObjectiveAvroTests */ = {
 			isa = PBXGroup;
 			children = (
-				D476EBBA18D33EDF0060579C /* person_schema.json */,
+				6B16B29220473FD3004276D5 /* person_schema.json */,
 				D476EBBB18D33EDF0060579C /* people_schema.json */,
 				D476EBBC18D33EDF0060579C /* people.json */,
 				D476EBB018D332AB0060579C /* ObjectiveAvroTests.m */,
@@ -180,11 +187,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D476EBB418D332AB0060579C /* Build configuration list for PBXNativeTarget "ObjectiveAvro" */;
 			buildPhases = (
-				A24CCF6ED4414117872675FD /* Check Pods Manifest.lock */,
 				D476EB7E18D332AB0060579C /* Sources */,
 				D476EB7F18D332AB0060579C /* Frameworks */,
 				D476EB8018D332AB0060579C /* Resources */,
-				EEAC08EDDED344DBA47BF2DE /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -199,11 +204,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D476EBB718D332AB0060579C /* Build configuration list for PBXNativeTarget "ObjectiveAvroTests" */;
 			buildPhases = (
-				2DEADF24766B401D8143B3C3 /* Check Pods Manifest.lock */,
+				2DEADF24766B401D8143B3C3 /* [CP] Check Pods Manifest.lock */,
 				D476EB9F18D332AB0060579C /* Sources */,
 				D476EBA018D332AB0060579C /* Frameworks */,
 				D476EBA118D332AB0060579C /* Resources */,
-				E840297798744A91B4B55D09 /* Copy Pods Resources */,
+				E840297798744A91B4B55D09 /* [CP] Copy Pods Resources */,
+				9AE2F935AC2EF6C56B9A8733 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -221,7 +227,7 @@
 		D476EB7A18D332AB0060579C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = Movile;
 				TargetAttributes = {
 					D476EBA218D332AB0060579C = {
@@ -264,7 +270,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D476EBAF18D332AB0060579C /* InfoPlist.strings in Resources */,
-				D476EBBD18D33EDF0060579C /* person_schema.json in Resources */,
 				D476EBBF18D33EDF0060579C /* people.json in Resources */,
 				D476EBBE18D33EDF0060579C /* people_schema.json in Resources */,
 			);
@@ -273,64 +278,52 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2DEADF24766B401D8143B3C3 /* Check Pods Manifest.lock */ = {
+		2DEADF24766B401D8143B3C3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ObjectiveAvroTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A24CCF6ED4414117872675FD /* Check Pods Manifest.lock */ = {
+		9AE2F935AC2EF6C56B9A8733 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ObjectiveAvroTests/Pods-ObjectiveAvroTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E840297798744A91B4B55D09 /* Copy Pods Resources */ = {
+		E840297798744A91B4B55D09 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-ObjectiveAvroTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		EEAC08EDDED344DBA47BF2DE /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ObjectiveAvroTests/Pods-ObjectiveAvroTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -400,18 +393,30 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -424,7 +429,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -438,25 +443,36 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -464,13 +480,14 @@
 		};
 		D476EBB518D332AB0060579C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F3AECFDA32714A7CA977D06E /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ObjectiveAvro/ObjectiveAvro-Prefix.pch";
 				INFOPLIST_FILE = "ObjectiveAvro/ObjectiveAvro-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.movile.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -478,13 +495,14 @@
 		};
 		D476EBB618D332AB0060579C /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F3AECFDA32714A7CA977D06E /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ObjectiveAvro/ObjectiveAvro-Prefix.pch";
 				INFOPLIST_FILE = "ObjectiveAvro/ObjectiveAvro-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.movile.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -492,7 +510,7 @@
 		};
 		D476EBB818D332AB0060579C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E41214375EEC429981B0AEFF /* Pods-ObjectiveAvroTests.xcconfig */;
+			baseConfigurationReference = 361896E12B93748B02D76DD0 /* Pods-ObjectiveAvroTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/ObjectiveAvro.app/ObjectiveAvro";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -507,6 +525,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "ObjectiveAvroTests/ObjectiveAvroTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.movile.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -515,7 +534,7 @@
 		};
 		D476EBB918D332AB0060579C /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E41214375EEC429981B0AEFF /* Pods-ObjectiveAvroTests.xcconfig */;
+			baseConfigurationReference = 50E5EAA33596824F4E023579 /* Pods-ObjectiveAvroTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/ObjectiveAvro.app/ObjectiveAvro";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -526,6 +545,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ObjectiveAvro/ObjectiveAvro-Prefix.pch";
 				INFOPLIST_FILE = "ObjectiveAvroTests/ObjectiveAvroTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.movile.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

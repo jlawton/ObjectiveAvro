@@ -19,6 +19,11 @@
             "name": "Bill Gates",
             "country": "USA",
             "age": 58
+        },
+        {
+            "name": "Stateless Johnny",
+            "country": null,
+            "age": 104
         }
     ],
     "generated_timestamp": 1389376800000
