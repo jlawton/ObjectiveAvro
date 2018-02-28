@@ -63,6 +63,58 @@
 
 #pragma mark - Public methods
 
+- (BOOL)writeJSONObjects:(NSArray *)jsonObjects
+                 toFile:(NSString *)filePath
+         forSchemaNamed:(NSString *)schemaName
+                  error:(NSError * __autoreleasing *)error {
+    NSParameterAssert(schemaName);
+    NSParameterAssert(jsonObjects);
+    NSParameterAssert(filePath);
+    
+    NSDictionary *jsonSchema = self.jsonSchemas[schemaName];
+    
+    avro_schema_t schema;
+    [self.avroSchemas[schemaName] getValue:&schema];
+    
+    if (! schema || !jsonSchema) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:@"No schema found for name: %@", schemaName];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+        return NO;
+    }
+    
+    avro_file_writer_t writer = NULL;
+    if (avro_file_writer_create([filePath cStringUsingEncoding:NSUTF8StringEncoding], schema, &writer) != 0) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:@"Couldn't create file writer: %s (%d)", avro_strerror(), errno];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+        return NO;
+    }
+    
+    for (id json in jsonObjects) {
+        avro_datum_t datum = [self valueForSchema:jsonSchema values:json];
+        if (avro_file_writer_append(writer, datum) != 0) {
+            if (error != NULL) {
+                NSString *errorMsg = [NSString stringWithFormat:@"Couldn't create file writer: %s (%d)", avro_strerror(), errno];
+                NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                         userInfo:userInfo];
+            }
+            return NO;
+        }
+    }
+    
+    avro_file_writer_close(writer);
+    
+    return YES;
+}
+
 - (NSData *)dataFromJSONObject:(id)jsonObject forSchemaNamed:(NSString *)schemaName
                          error:(NSError * __autoreleasing *)error {
     

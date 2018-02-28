@@ -15,6 +15,22 @@
 @interface OAVAvroSerialization : NSObject <NSCopying, NSCoding>
 
 /**
+ * Serializes a complete Avro file to disk. Unlike `dataFromJSONObject`, this
+ * includes the header and schema, yielding a complete, transferrable file.
+ *
+ * @param jsonObjects   An array of objects to be encoded
+ * @param filePath      The path to which to write the Avro file
+ * @param schemaName    The schema name used to describe the object
+ * @param error         A pointer to the error object that will represent any errors ocurred
+ *
+ * @return A BOOL, `YES` if writing succeeded, `NO` if it failed
+ */
+- (BOOL)writeJSONObjects:(NSArray *)jsonObjects
+                  toFile:(NSString *)filePath
+          forSchemaNamed:(NSString *)schemaName
+                   error:(NSError * __autoreleasing *)error;
+
+/**
  *  Serializes a JSON object to NSData, containing the Avro-encoded object.
  *
  *  @param jsonObject The object to be encoded
