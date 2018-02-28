@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B16B29320476209004276D5 /* person_schema.json in Resources */ = {isa = PBXBuildFile; fileRef = 6B16B29220473FD3004276D5 /* person_schema.json */; };
 		D476EB8618D332AB0060579C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D476EB8518D332AB0060579C /* Foundation.framework */; };
 		D476EB8818D332AB0060579C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D476EB8718D332AB0060579C /* CoreGraphics.framework */; };
 		D476EB8A18D332AB0060579C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D476EB8918D332AB0060579C /* UIKit.framework */; };
@@ -270,6 +271,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D476EBAF18D332AB0060579C /* InfoPlist.strings in Resources */,
+				6B16B29320476209004276D5 /* person_schema.json in Resources */,
 				D476EBBF18D33EDF0060579C /* people.json in Resources */,
 				D476EBBE18D33EDF0060579C /* people_schema.json in Resources */,
 			);

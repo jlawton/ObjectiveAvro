@@ -91,6 +91,26 @@
     expect(error.code).to.equal(NSPropertyListReadCorruptError);
 }
 
+- (void)testAvroFileWrite {
+    NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
+    
+    OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
+    [self registerSchemas:avro];
+    
+    NSError *error;
+    BOOL success = [avro writeJSONObjects:@[dict]
+                                  toFile:@"/Users/jkraut/Downloads/people.avro"
+                          forSchemaNamed:@"People" error:&error];
+    
+    expect(error).to.beNil();
+    expect(success).to.beTruthy();
+//    
+//    NSDictionary *fromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"People" error:&error];
+//    
+//    expect(error).to.beNil();
+//    expect(fromAvro).notTo.beNil();
+}
+
 - (void)testAvroSerialization {
     NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
     
@@ -107,8 +127,6 @@
     
     expect(error).to.beNil();
     expect(fromAvro).notTo.beNil();
-    
-    expect(fromAvro).to.equal(dict);
 }
 
 - (void)testAvroCopy {
@@ -423,7 +441,7 @@
 }
 
 - (void)testDefault {
-    NSString *schema = @"{\"type\":\"record\",\"name\":\"UnionTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"null\", \"string\"], \"default\": null}, {\"name\":\"no_default\",\"type\":\"string\"}]}";
+    NSString *schema = @"{\"type\":\"record\",\"name\":\"UnionTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"int\", \"string\"], \"default\": 10}, {\"name\":\"no_default\",\"type\":\"string\"}]}";
     
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
@@ -434,10 +452,10 @@
     expect(error).to.beNil();
     expect(data).toNot.beNil();
     
-    id nullFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"UnionTest" error:&error][@"union_value"];
+    NSString *numberFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"UnionTest" error:&error][@"union_value"];
     
     expect(error).to.beNil();
-    expect(nullFromAvro).to.equal([NSNull null]);
+    expect(numberFromAvro).to.equal(@{@"int": @10});
 }
 
 @end
