@@ -99,7 +99,7 @@
     
     NSError *error;
     BOOL success = [avro writeJSONObjects:@[dict]
-                                  toFile:@"/Users/jkraut/Downloads/people.avro"
+                                  toFile:[NSTemporaryDirectory() stringByAppendingPathComponent:@"people.avro"]
                           forSchemaNamed:@"People" error:&error];
     
     expect(error).to.beNil();
@@ -109,6 +109,42 @@
 //    
 //    expect(error).to.beNil();
 //    expect(fromAvro).notTo.beNil();
+}
+
+- (void)testAvroFileReopen {
+    NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
+    
+    OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
+    [self registerSchemas:avro];
+    
+    NSError *error;
+    
+    NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"people.avro"];
+    NSLog(@"writing to %@", filePath);
+    OAVFileWriterToken token = [avro startFile:filePath forSchemaNamed:@"People" error:&error];
+    expect(error).to.beNil();
+//    expect(token).toNot.beNull();
+    
+    BOOL success = [avro writeJSONObjects:@[dict] toWriter:token
+                           forSchemaNamed:@"People" error:&error];
+    
+    expect(error).to.beNil();
+    expect(success).to.beTruthy();
+    
+    [avro closeFile:token];
+    
+    token = [avro openFile:filePath error:&error];
+    
+    expect(error).to.beNil();
+//    expect(token).toNot.beNull();
+    
+    success = [avro writeJSONObjects:@[dict] toWriter:token
+                           forSchemaNamed:@"People" error:&error];
+    
+    expect(error).to.beNil();
+    expect(success).to.beTruthy();
+    
+    [avro closeFile:token];
 }
 
 - (void)testAvroSerialization {

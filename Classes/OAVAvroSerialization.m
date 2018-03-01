@@ -95,6 +95,22 @@
     return writer;
 }
 
+- (OAVFileWriterToken)openFile:(NSString *)filePath
+                         error:(NSError * __autoreleasing *)error {
+    NSParameterAssert(filePath);
+    avro_file_writer_t writer = NULL;
+    if (avro_file_writer_open([filePath cStringUsingEncoding:NSUTF8StringEncoding], &writer) != 0) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:@"Couldn't open file writer: %s (%d)", avro_strerror(), errno];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+        return nil;
+    }
+    return writer;
+}
+
 - (BOOL)writeJSONObjects:(NSArray *)jsonObjects
                 toWriter:(avro_file_writer_t)writer
           forSchemaNamed:(NSString *)schemaName
@@ -127,7 +143,7 @@
     return YES;
 }
 
-- (void)endFile:(avro_file_writer_t)writer {
+- (void)closeFile:(avro_file_writer_t)writer {
     avro_file_writer_close(writer);
 }
 
@@ -146,7 +162,7 @@
     if (![self writeJSONObjects:jsonObjects toWriter:writer forSchemaNamed:schemaName error:&error]) {
         return NO;
     } 
-    [self endFile:writer];
+    [self closeFile:writer];
     return YES;
 }
 

@@ -21,7 +21,7 @@
 typedef void * OAVFileWriterToken;
 
 /**
- * Open a file for writing with the given schema. The schema must already be
+ * Start a file for writing with the given schema. The schema must already be
  * registered with this serialization object.
  *
  * @param filePath      The path to which to write the Avro file
@@ -33,6 +33,17 @@ typedef void * OAVFileWriterToken;
 - (nullable OAVFileWriterToken)startFile:(nonnull NSString *)filePath
                           forSchemaNamed:(nonnull NSString *)schemaName
                                    error:( NSError * _Nullable  __autoreleasing *)error;
+/**
+ * Re-open a file for writing. The file must already have been created with
+ * startFile:forSchemaNamed:error:.
+ *
+ * @param filePath      The path to which to write the Avro file
+ * @param error         A pointer to the error object that will represent any errors ocurred
+ *
+ * @return An `OAVFileWriterToken`, to be used in future calls.
+ */
+- (nullable OAVFileWriterToken)openFile:(NSString *)filePath
+                                  error:(NSError * __autoreleasing *)error;
 
 /**
  * Serializes the given JSON objects to the already-open file. Can be called
@@ -55,7 +66,7 @@ typedef void * OAVFileWriterToken;
  *
  * @param writer        The token obtained by calling startFile:forSchemaNamed:
  */
-- (void)endFile:(nonnull OAVFileWriterToken)writer;
+- (void)closeFile:(nonnull OAVFileWriterToken)writer;
 
 /**
  * Serializes a complete Avro file to disk. Unlike `dataFromJSONObject`, this
