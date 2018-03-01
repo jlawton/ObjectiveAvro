@@ -477,7 +477,7 @@
 }
 
 - (void)testDefault {
-    NSString *schema = @"{\"type\":\"record\",\"name\":\"UnionTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"int\", \"string\"], \"default\": 10}, {\"name\":\"no_default\",\"type\":\"string\"}]}";
+    NSString *schema = @"{\"type\":\"record\",\"name\":\"DefaultTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"int\", \"string\"], \"default\": 10}, {\"name\":\"no_default\",\"type\":\"string\"}]}";
     
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
@@ -492,6 +492,23 @@
     
     expect(error).to.beNil();
     expect(numberFromAvro).to.equal(@{@"int": @10});
+}
+
+- (void)testNumericDefault {
+    NSString *schema = @"{\"type\":\"record\",\"name\":\"NumericDefaultTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"test\",\"type\":[\"null\", \"long\"], \"default\": null}]}";
+    
+    OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
+    [avro registerSchema:schema error:NULL];
+    
+    
+    NSError *error;
+    NSData *data = [avro dataFromJSONObject:@{@"test": @10} forSchemaNamed:@"NumericDefaultTest" error:&error];
+    expect(error).to.beNil();
+    expect(data).toNot.beNil();
+    
+    data = [avro dataFromJSONObject:@{@"test": @"null"} forSchemaNamed:@"NumericDefaultTest" error:&error];
+    expect(error).to.beNil();
+    expect(data).toNot.beNil();
 }
 
 @end

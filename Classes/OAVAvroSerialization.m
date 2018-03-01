@@ -358,9 +358,10 @@
 
     // defaults
     if (([values isKindOfClass:[NSNull class]] || values == nil)
-        && schema[@"default"] != nil
-        && schema[@"default"] != values) {
-        return [self valueForSchema:schema values:schema[@"default"]];
+        && schema[@"default"] != nil) {
+        NSMutableDictionary *defaultSchema = [schema mutableCopy];
+        defaultSchema[@"default"] = nil;
+        return [self valueForSchema:defaultSchema values:schema[@"default"]];
     }
     
     // union types
