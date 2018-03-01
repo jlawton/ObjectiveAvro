@@ -494,7 +494,7 @@
     expect(numberFromAvro).to.equal(@{@"int": @10});
 }
 
-- (void)testNumericDefault {
+- (void)testNullDefault {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"NumericDefaultTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"test\",\"type\":[\"null\", \"long\"], \"default\": null}]}";
     
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
@@ -506,7 +506,7 @@
     expect(error).to.beNil();
     expect(data).toNot.beNil();
     
-    data = [avro dataFromJSONObject:@{@"test": @"null"} forSchemaNamed:@"NumericDefaultTest" error:&error];
+    data = [avro dataFromJSONObject:@{@"test": [NSNull null]} forSchemaNamed:@"NumericDefaultTest" error:&error];
     expect(error).to.beNil();
     expect(data).toNot.beNil();
 }

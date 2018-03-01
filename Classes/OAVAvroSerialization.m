@@ -379,8 +379,9 @@
             }
         }
     }
-    
-    if ([type isEqualToString:@"string"] && [values isKindOfClass:[NSString class]]) {
+    if ([values isKindOfClass:[NSNull class]] && ![type isEqualToString:@"null"]) {
+        // if we're given a null unexpectedly, we can't do much
+    } else if ([type isEqualToString:@"string"] && [values isKindOfClass:[NSString class]]) {
         value = avro_string([values cStringUsingEncoding:NSUTF8StringEncoding]);
     } else if ([type isEqualToString:@"float"]) {
         value = avro_float([values floatValue]);
