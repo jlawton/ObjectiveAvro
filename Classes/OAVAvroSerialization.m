@@ -63,27 +63,23 @@
 
 #pragma mark - Public methods
 
-- (BOOL)writeJSONObjects:(NSArray *)jsonObjects
-                 toFile:(NSString *)filePath
-         forSchemaNamed:(NSString *)schemaName
-                  error:(NSError * __autoreleasing *)error {
+- (OAVFileWriterToken)startFile:(NSString *)filePath
+                 forSchemaNamed:(NSString *)schemaName
+                          error:(NSError * __autoreleasing *)error {
     NSParameterAssert(schemaName);
-    NSParameterAssert(jsonObjects);
     NSParameterAssert(filePath);
-    
-    NSDictionary *jsonSchema = self.jsonSchemas[schemaName];
     
     avro_schema_t schema;
     [self.avroSchemas[schemaName] getValue:&schema];
     
-    if (! schema || !jsonSchema) {
+    if (!schema) {
         if (error != NULL) {
             NSString *errorMsg = [NSString stringWithFormat:@"No schema found for name: %@", schemaName];
             NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
                                      userInfo:userInfo];
         }
-        return NO;
+        return nil;
     }
     
     avro_file_writer_t writer = NULL;
@@ -94,9 +90,28 @@
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
                                      userInfo:userInfo];
         }
+        return nil;
+    }
+    return writer;
+}
+
+- (BOOL)writeJSONObjects:(NSArray *)jsonObjects
+                toWriter:(avro_file_writer_t)writer
+          forSchemaNamed:(NSString *)schemaName
+                   error:(NSError * __autoreleasing *)error {
+    NSParameterAssert(schemaName);
+    NSParameterAssert(jsonObjects);
+    NSParameterAssert(writer);
+    NSDictionary *jsonSchema = self.jsonSchemas[schemaName];
+    if (!jsonSchema) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:@"No schema found for name: %@", schemaName];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
         return NO;
     }
-    
     for (id json in jsonObjects) {
         avro_datum_t datum = [self valueForSchema:jsonSchema values:json];
         if (avro_file_writer_append(writer, datum) != 0) {
@@ -109,9 +124,29 @@
             return NO;
         }
     }
-    
+    return YES;
+}
+
+- (void)endFile:(avro_file_writer_t)writer {
     avro_file_writer_close(writer);
+}
+
+- (BOOL)writeJSONObjects:(NSArray *)jsonObjects
+                 toFile:(NSString *)filePath
+         forSchemaNamed:(NSString *)schemaName
+                  error:(NSError * __autoreleasing *)error {
+    NSParameterAssert(schemaName);
+    NSParameterAssert(jsonObjects);
+    NSParameterAssert(filePath);
     
+    avro_file_writer_t writer = [self startFile:filePath forSchemaNamed:schemaName error:&error];
+    if (!writer) {
+        return NO;
+    }
+    if (![self writeJSONObjects:jsonObjects toWriter:writer forSchemaNamed:schemaName error:&error]) {
+        return NO;
+    } 
+    [self endFile:writer];
     return YES;
 }
 
@@ -391,7 +426,7 @@
             avro_datum_decref(datum);
         }];
     }
-    
+    // TODO: should throw an error here if there's no value
     return value;
 }
 
