@@ -179,7 +179,7 @@
 }
 
 - (void)testMissingFieldAvroSerialization {
-    NSString *json = @"{\"people\":[{\"name\":\"Marcelo Fabri\",\"age\":20},{\"name\":\"Tim Cook\",\"country\":\"USA\",\"age\":53},{\"name\":\"Steve Wozniak\",\"country\":\"USA\",\"age\":63},{\"name\":\"Bill Gates\",\"country\":\"USA\",\"age\":58}],\"generated_timestamp\":1389376800000}";
+    NSString *json = @"{\"people\":[{\"name\":\"Marcelo Fabri\"},{\"name\":\"Tim Cook\",\"country\":\"USA\",\"age\":53},{\"name\":\"Steve Wozniak\",\"country\":\"USA\",\"age\":63},{\"name\":\"Bill Gates\",\"country\":\"USA\",\"age\":58}],\"generated_timestamp\":1389376800000}";
     
     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     
@@ -291,7 +291,7 @@
         NSString *numberFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"FloatTest" error:&error][@"float_value"];
         
         expect(error).to.beNil();
-        expect(numberFromAvro).to.equal(number);
+        expect(numberFromAvro).to.beCloseToWithin(number, .01);
     }
 }
 
