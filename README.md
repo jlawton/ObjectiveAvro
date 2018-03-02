@@ -1,5 +1,6 @@
 # ObjectiveAvro
 
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Version](http://cocoapod-badges.herokuapp.com/v/ObjectiveAvro/badge.png)](http://cocoadocs.org/docsets/ObjectiveAvro)
 [![Platform](http://cocoapod-badges.herokuapp.com/p/ObjectiveAvro/badge.png)](http://cocoadocs.org/docsets/ObjectiveAvro)
 
@@ -53,18 +54,52 @@ NSData *data = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForReso
 NSData *data = [avro JSONObjectFromData:data forSchemaNamed:@"Person" error:&error];
 ```
 
+### Serializing to Disk (Including Schema)
+
+```objective-c
+[avro writeJSONObjects:@[dict]
+    toFile:[NSTemporaryDirectory() stringByAppendingPathComponent:@"marcelo_with_schema.avro"]
+    forSchemaNamed:@"Person" error:&error];
+```
+
+### Serializing Over Time
+
+```objective-c
+OAVFileWriterToken token = [avro startFile:[NSTemporaryDirectory() stringByAppendingPathComponent:@"marcelo_with_schema.avro"]
+    forSchemaNamed:@"People" error:&error];
+[avro writeJSONObjects:@[dict] toWriter:token forSchemaNamed:@"People" error:&error]
+[avro closeFile:token];
+// file is now valid and ready for processing
+…
+token = [avro openFile:[NSTemporaryDirectory() stringByAppendingPathComponent:@"marcelo_with_schema.avro"] error:&error];
+[avro writeJSONObjects:@[dict] toWriter:token forSchemaNamed:@"People" error:&error]
+[avro closeFile:token];
+// file is again valid, with additional data
+```
+
 ## Requirements
 
-**ObjectiveAvro** requires Xcode 5, targeting either iOS 6.0 and above, or Mac OS 10.8 Mountain Lion ([64-bit with modern Cocoa runtime](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtVersionsPlatforms.html)) and above.
+**ObjectiveAvro** requires Xcode 5, targeting either iOS 8.0 and above, or Mac OS 10.8 Mountain Lion ([64-bit with modern Cocoa runtime](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtVersionsPlatforms.html)) and above.
 
-**ObjectiveAvro** also requires [Avro-C](http://avro.apache.org/docs/current/api/c/index.html), which is automatically imported when using [CocoaPods](http://cocoapods.org).
+**ObjectiveAvro** also requires [Avro-C](http://avro.apache.org/docs/current/api/c/index.html), which is automatically imported when using [CocoaPods](http://cocoapods.org). It uses an old version, which is included in the release.
 
 ## Installation
 
 **ObjectiveAvro** is available through [CocoaPods](http://cocoapods.org), to install
 it simply add the following line to your Podfile:
-
+```
     pod "ObjectiveAvro"
+```
+Note that because of Cocoapod's magic, this may end up with an incompatible version of `Avro-C`. Try it and let us know.
+
+#### Carthage (iOS 8+, OS X 10.9+)
+
+You can use [Carthage](https://github.com/Carthage/Carthage) to install **ObjectiveAvro** by adding it to your `Cartfile`:
+
+```
+github "Mindstronghealth/ObjectiveAvro"
+```
+
 
 ## Testing
 
@@ -73,7 +108,7 @@ Tests are done with `XCTest` and [`Expecta`](https://github.com/specta/expecta).
 
 ## Known limitations
 
-- Currently, only the following types are supported: `string`, `float`, `double`, `int`, `long`, `boolean`, `null`, `bytes`, `array`, `map` and `record`. That means that `enum`, `union` and `fixed` **are not** currently supported.
+- Currently, only the following types are supported: `string`, `float`, `double`, `int`, `long`, `boolean`, `null`, `bytes`, `array`, `map`, `union` and `record`. That means that `enum` and `fixed` **are not** currently supported.
 
 ## Author
 
