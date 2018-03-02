@@ -40,6 +40,7 @@ BOOL result = [avro registerSchema:schema error:&error];
 
 ### Transforming JSON to NSData
 
+Note that this `NSData` will be an `Avro` *fragment*, rather than a full `Avro` *file*. This is great for many uses, but it means that the receiver will need to have the same schema used to generate the data.
 ```objective-c
 NSError *error;
 NSDictionary *dict = @{@"name": @"Marcelo Fabri", @"country": @"Brazil", @"age": @20};
@@ -56,6 +57,7 @@ NSData *data = [avro JSONObjectFromData:data forSchemaNamed:@"Person" error:&err
 
 ### Serializing to Disk (Including Schema)
 
+This method of serialization encodes the schema along with the data, resulting in a complete `Avro` file that can be distributed and interpreted without a schema alongside.
 ```objective-c
 [avro writeJSONObjects:@[dict]
     toFile:[NSTemporaryDirectory() stringByAppendingPathComponent:@"marcelo_with_schema.avro"]
@@ -108,7 +110,7 @@ Tests are done with `XCTest` and [`Expecta`](https://github.com/specta/expecta).
 
 ## Known limitations
 
-- Currently, only the following types are supported: `string`, `float`, `double`, `int`, `long`, `boolean`, `null`, `bytes`, `array`, `map`, `union` and `record`. That means that `enum` and `fixed` **are not** currently supported.
+- Currently, only the following types are supported: `string`, `float`, `double`, `int`, `long`, `boolean`, `null`, `bytes`, `array`, `map`, `union` and `record`. That means that `enum` and `fixed` **are not** currently supported. Although the library knows how to write complete `Avro` files, it does not yet know how to read them. (Any of these would make excellent self-contained beginner tasks.)
 
 ## Author
 
