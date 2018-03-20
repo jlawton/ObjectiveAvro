@@ -137,14 +137,17 @@
                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
                                          userInfo:userInfo];
             }
+            avro_datum_decref(datum);
             return NO;
         }
+        avro_datum_decref(datum);
     }
     return YES;
 }
 
 - (void)closeFile:(avro_file_writer_t)writer {
     avro_file_writer_close(writer);
+    avro_writer_free(writer);
 }
 
 - (BOOL)writeJSONObjects:(NSArray *)jsonObjects
