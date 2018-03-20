@@ -375,9 +375,12 @@
             unionSchema[@"type"] = unionType;
             avro_datum_t unionValue = [self valueForSchema:unionSchema values:values];
             if (unionValue != nil) {
-                value = avro_union([self schemaFromName:schema],
+                avro_schema_t avroSchema = [self schemaFromName:schema];
+                value = avro_union(avroSchema,
                                    [(NSArray *)type indexOfObject:unionType],
                                    unionValue);
+                avro_schema_decref(avroSchema);
+                avro_datum_decref(unionValue);
                 return value;
             }
         }
