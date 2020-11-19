@@ -84,7 +84,22 @@
 		1ABFE40B1B695B15003B38D8 /* utf.c in Sources */ = {isa = PBXBuildFile; fileRef = 1ABFE3FC1B695B15003B38D8 /* utf.c */; };
 		1ABFE40C1B695B15003B38D8 /* utf.h in Headers */ = {isa = PBXBuildFile; fileRef = 1ABFE3FD1B695B15003B38D8 /* utf.h */; };
 		1ABFE40D1B695B15003B38D8 /* value.c in Sources */ = {isa = PBXBuildFile; fileRef = 1ABFE3FE1B695B15003B38D8 /* value.c */; };
+		98574AF62566D4B2004A2488 /* ObjectiveAvroTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 98574AF52566D4B2004A2488 /* ObjectiveAvroTests.m */; };
+		98574AF82566D4B2004A2488 /* ObjectiveAvro.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ABFE3431B69578B003B38D8 /* ObjectiveAvro.framework */; };
+		98574B012566D7F1004A2488 /* people.json in Resources */ = {isa = PBXBuildFile; fileRef = 98574AFE2566D7F1004A2488 /* people.json */; };
+		98574B022566D7F1004A2488 /* people_schema.json in Resources */ = {isa = PBXBuildFile; fileRef = 98574AFF2566D7F1004A2488 /* people_schema.json */; };
+		98574B032566D7F1004A2488 /* person_schema.json in Resources */ = {isa = PBXBuildFile; fileRef = 98574B002566D7F1004A2488 /* person_schema.json */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		98574AF92566D4B2004A2488 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1ABFE33A1B69578B003B38D8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1ABFE3421B69578B003B38D8;
+			remoteInfo = ObjectiveAvro;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1ABFE3431B69578B003B38D8 /* ObjectiveAvro.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectiveAvro.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -166,6 +181,12 @@
 		1ABFE3FC1B695B15003B38D8 /* utf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = utf.c; sourceTree = "<group>"; };
 		1ABFE3FD1B695B15003B38D8 /* utf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utf.h; sourceTree = "<group>"; };
 		1ABFE3FE1B695B15003B38D8 /* value.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = value.c; sourceTree = "<group>"; };
+		98574AF32566D4B2004A2488 /* ObjectiveAvroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObjectiveAvroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		98574AF52566D4B2004A2488 /* ObjectiveAvroTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjectiveAvroTests.m; sourceTree = "<group>"; };
+		98574AF72566D4B2004A2488 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		98574AFE2566D7F1004A2488 /* people.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = people.json; sourceTree = "<group>"; };
+		98574AFF2566D7F1004A2488 /* people_schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = people_schema.json; sourceTree = "<group>"; };
+		98574B002566D7F1004A2488 /* person_schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person_schema.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +197,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		98574AF02566D4B2004A2488 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98574AF82566D4B2004A2488 /* ObjectiveAvro.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -183,6 +212,7 @@
 			isa = PBXGroup;
 			children = (
 				1ABFE3451B69578B003B38D8 /* ObjectiveAvro */,
+				98574AF42566D4B2004A2488 /* ObjectiveAvroTests */,
 				1ABFE3441B69578B003B38D8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -191,6 +221,7 @@
 			isa = PBXGroup;
 			children = (
 				1ABFE3431B69578B003B38D8 /* ObjectiveAvro.framework */,
+				98574AF32566D4B2004A2488 /* ObjectiveAvroTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -339,6 +370,18 @@
 			path = src;
 			sourceTree = "<group>";
 		};
+		98574AF42566D4B2004A2488 /* ObjectiveAvroTests */ = {
+			isa = PBXGroup;
+			children = (
+				98574AFF2566D7F1004A2488 /* people_schema.json */,
+				98574AFE2566D7F1004A2488 /* people.json */,
+				98574B002566D7F1004A2488 /* person_schema.json */,
+				98574AF52566D4B2004A2488 /* ObjectiveAvroTests.m */,
+				98574AF72566D4B2004A2488 /* Info.plist */,
+			);
+			path = ObjectiveAvroTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -402,6 +445,24 @@
 			productReference = 1ABFE3431B69578B003B38D8 /* ObjectiveAvro.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		98574AF22566D4B2004A2488 /* ObjectiveAvroTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 98574AFD2566D4B2004A2488 /* Build configuration list for PBXNativeTarget "ObjectiveAvroTests" */;
+			buildPhases = (
+				98574AEF2566D4B2004A2488 /* Sources */,
+				98574AF02566D4B2004A2488 /* Frameworks */,
+				98574AF12566D4B2004A2488 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				98574AFA2566D4B2004A2488 /* PBXTargetDependency */,
+			);
+			name = ObjectiveAvroTests;
+			productName = ObjectiveAvroTests;
+			productReference = 98574AF32566D4B2004A2488 /* ObjectiveAvroTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -414,6 +475,11 @@
 					1ABFE3421B69578B003B38D8 = {
 						CreatedOnToolsVersion = 6.4;
 					};
+					98574AF22566D4B2004A2488 = {
+						CreatedOnToolsVersion = 11.3.1;
+						DevelopmentTeam = 6ZBARRDHAK;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 1ABFE33D1B69578B003B38D8 /* Build configuration list for PBXProject "ObjectiveAvro" */;
@@ -421,6 +487,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 1ABFE3391B69578B003B38D8;
@@ -429,6 +496,7 @@
 			projectRoot = "";
 			targets = (
 				1ABFE3421B69578B003B38D8 /* ObjectiveAvro */,
+				98574AF22566D4B2004A2488 /* ObjectiveAvroTests */,
 			);
 		};
 /* End PBXProject section */
@@ -438,6 +506,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		98574AF12566D4B2004A2488 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98574B012566D7F1004A2488 /* people.json in Resources */,
+				98574B022566D7F1004A2488 /* people_schema.json in Resources */,
+				98574B032566D7F1004A2488 /* person_schema.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -496,7 +574,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		98574AEF2566D4B2004A2488 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98574AF62566D4B2004A2488 /* ObjectiveAvroTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		98574AFA2566D4B2004A2488 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1ABFE3421B69578B003B38D8 /* ObjectiveAvro */;
+			targetProxy = 98574AF92566D4B2004A2488 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1ABFE3571B69578B003B38D8 /* Debug */ = {
@@ -630,6 +724,77 @@
 			};
 			name = Release;
 		};
+		98574AFB2566D4B2004A2488 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6ZBARRDHAK;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = ObjectiveAvroTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindstrong.KeyboardTests.ObjectiveAvroTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		98574AFC2566D4B2004A2488 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6ZBARRDHAK;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = ObjectiveAvroTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindstrong.KeyboardTests.ObjectiveAvroTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -647,6 +812,15 @@
 			buildConfigurations = (
 				1ABFE35A1B69578B003B38D8 /* Debug */,
 				1ABFE35B1B69578B003B38D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		98574AFD2566D4B2004A2488 /* Build configuration list for PBXNativeTarget "ObjectiveAvroTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				98574AFB2566D4B2004A2488 /* Debug */,
+				98574AFC2566D4B2004A2488 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
