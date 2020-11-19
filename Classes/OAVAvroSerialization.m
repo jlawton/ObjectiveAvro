@@ -238,7 +238,7 @@
     
     char buf[[data length]];
     [data getBytes:&buf length:[data length]];
-    
+
     avro_reader_t reader = avro_reader_memory(buf, sizeof(buf));
     avro_datum_t datum_out;
     
@@ -260,6 +260,64 @@
                                                    options:0 error:error];
     return jsonValue;
 }
+
+- (NSArray *)JSONObjectsFromFile:(NSString *)filePath error:(NSError * __autoreleasing *)error {
+    
+    avro_file_reader_t  reader;
+    int errno;
+    char *filename = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
+    
+    void (^reportError)(NSString* format, char* avro_message, int errono) = ^(NSString* format, char* avro_message, int errono) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:format, avro_strerror(), errono];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+    };
+
+    
+    if (errno = avro_file_reader(filename, &reader)) {
+        reportError(@"Couldn't open file reader: %s %d", avro_strerror(),errno);
+        return nil;
+    }
+
+    avro_schema_t  wschema;
+    avro_value_iface_t  *iface;
+    avro_value_t  value;
+
+    wschema = avro_file_reader_get_writer_schema(reader);
+    iface = avro_generic_class_from_schema(wschema);
+    avro_generic_value_new(iface, &value);
+
+    int rval;
+    NSMutableArray* serializedAvro = [NSMutableArray array];
+    while ((rval = avro_file_reader_read_value(reader, &value)) == 0) {
+        char  *json;
+
+        if (errno = avro_value_to_json(&value, 1, &json)) {
+            reportError(@"Error converting value to JSON: %s", avro_strerror(),errno);
+            return nil;
+        }
+        [serializedAvro addObject:[NSString stringWithUTF8String:json]];
+        avro_value_reset(&value);
+    }
+
+    // If it was not an EOF that caused it to fail,
+    // print the error.
+    if (rval != EOF) {
+        reportError(@"END of file error: %s %d", avro_strerror(),errno);
+        return nil;
+    }
+
+    avro_file_reader_close(reader);
+    avro_value_decref(&value);
+    avro_value_iface_decref(iface);
+    avro_schema_decref(wschema);
+
+    return serializedAvro;
+}
+
 
 - (BOOL)registerSchema:(NSString *)schema error:(NSError * __autoreleasing *)error {
     NSParameterAssert(schema);

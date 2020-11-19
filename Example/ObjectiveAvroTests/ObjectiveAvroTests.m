@@ -33,6 +33,16 @@
     return [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
 }
 
+- (NSString *) dictionaryToJsonString:(NSDictionary*)dict
+{
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict
+                                                       options:0
+                                                         error:&error];
+    expect(jsonData);
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
 - (void)registerSchemas:(OAVAvroSerialization *)avro {
     NSString *personSchema = [[self class] stringFromBundleResource:@"person_schema"];
     NSString *peopleSchema = [[self class] stringFromBundleResource:@"people_schema"];
@@ -98,17 +108,25 @@
     [self registerSchemas:avro];
     
     NSError *error;
+    NSString *fullAvroPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"people.avro"];
     BOOL success = [avro writeJSONObjects:@[dict]
-                                  toFile:[NSTemporaryDirectory() stringByAppendingPathComponent:@"people.avro"]
+                                  toFile:fullAvroPath
                           forSchemaNamed:@"People" error:&error];
+    success = [avro writeJSONObjects:@[dict]
+                              toFile:fullAvroPath
+                      forSchemaNamed:@"People" error:&error];
     
     expect(error).to.beNil();
     expect(success).to.beTruthy();
-//    
-//    NSDictionary *fromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"People" error:&error];
-//    
-//    expect(error).to.beNil();
-//    expect(fromAvro).notTo.beNil();
+    
+    NSArray* seralization = [avro JSONObjectsFromFile:fullAvroPath error:&error];
+    expect(seralization.count == 1);
+    // serealized dictionary must match the dictionary written into file
+    NSDictionary  *dictObj = [NSJSONSerialization
+                              JSONObjectWithData:[[seralization objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding]
+                              options:0
+                              error:&error];
+    expect([dictObj isEqualToDictionary:dict]);
 }
 
 - (void)testAvroFileReopen {
@@ -145,6 +163,19 @@
     expect(success).to.beTruthy();
     
     [avro closeFile:token];
+    
+    NSArray* seralization = [avro JSONObjectsFromFile:filePath error:&error];
+    expect(seralization.count == 2);
+    
+    for (int i=0; i < 2; i++) {
+        // serealized dictionary must match the dictionary written into file
+        NSDictionary  *dictObj = [NSJSONSerialization
+                                  JSONObjectWithData:[[seralization objectAtIndex:i] dataUsingEncoding:NSUTF8StringEncoding]
+                                  options:0
+                                  error:&error];
+        expect([dictObj isEqualToDictionary:dict]);
+    }
+
 }
 
 - (void)testAvroSerialization {
@@ -214,6 +245,8 @@
     expect(dataFromCopy).to.equal(data);
 }
 
+// we should fail, but schema validation doesn't seem to work correctly
+//  @TODO - https://mindstronghealth.atlassian.net/browse/HEALTH-5227
 - (void)testMissingFieldAvroSerialization {
     NSString *json = @"{\"people\":[{\"name\":\"Marcelo Fabri\"},{\"name\":\"Tim Cook\",\"country\":\"USA\",\"age\":53},{\"name\":\"Steve Wozniak\",\"country\":\"USA\",\"age\":63},{\"name\":\"Bill Gates\",\"country\":\"USA\",\"age\":58}],\"generated_timestamp\":1389376800000}";
     
@@ -477,7 +510,7 @@
 }
 
 - (void)testDefault {
-    NSString *schema = @"{\"type\":\"record\",\"name\":\"DefaultTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"int\", \"string\"], \"default\": 10}, {\"name\":\"no_default\",\"type\":\"string\"}]}";
+    NSString *schema = @"{\"type\":\"record\",\"name\":\"UnionTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"int\", \"string\"], \"default\": 10}, {\"name\":\"no_default\",\"type\":\"string\"}]}";
     
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
