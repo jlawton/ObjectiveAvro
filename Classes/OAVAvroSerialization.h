@@ -114,7 +114,7 @@ typedef void * OAVFileWriterToken;
 *  @param filePath  fiel path to saved avro file
 *  @param error      A pointer to the error object that will represent any errors ocurred
 *
-*  @return A Foundation representation of the Avro encoded object
+*  @return An array of json strings
 */
 - (NSArray *)JSONObjectsFromFile:(NSString *)filePath error:(NSError * __autoreleasing *)error;
 
