@@ -25,9 +25,9 @@
 #    include <byteswap.h>
 #  endif
 #endif
-//#ifdef DEFLATE_CODEC
+#ifdef DEFLATE_CODEC
 #include <zlib.h>
-//#endif
+#endif
 #ifdef LZMA_CODEC
 #include <lzma.h>
 #endif
@@ -188,7 +188,7 @@ static int reset_snappy(avro_codec_t c)
 
 /* Deflate codec */
 
-//#ifdef DEFLATE_CODEC
+#ifdef DEFLATE_CODEC
 
 struct codec_data_deflate {
 	z_stream deflate;
@@ -378,7 +378,7 @@ static int reset_deflate(avro_codec_t c)
 	return 0;
 }
 
-//#endif // DEFLATE_CODEC
+#endif // DEFLATE_CODEC
 
 /* LZMA codec */
 
@@ -524,11 +524,11 @@ int avro_codec(avro_codec_t codec, const char *type)
 	}
 #endif
 
-//#ifdef DEFLATE_CODEC
+#ifdef DEFLATE_CODEC
 	if (strcmp("deflate", type) == 0) {
 		return codec_deflate(codec);
 	}
-//#endif
+#endif
 
 #ifdef LZMA_CODEC
 	if (strcmp("lzma", type) == 0) {
@@ -554,10 +554,10 @@ int avro_codec_encode(avro_codec_t c, void * data, int64_t len)
 	case AVRO_CODEC_SNAPPY:
 		return encode_snappy(c, data, len);
 #endif
-//#ifdef DEFLATE_CODEC
+#ifdef DEFLATE_CODEC
 	case AVRO_CODEC_DEFLATE:
 		return encode_deflate(c, data, len);
-//#endif
+#endif
 #ifdef LZMA_CODEC
 	case AVRO_CODEC_LZMA:
 		return encode_lzma(c, data, len);
@@ -577,10 +577,10 @@ int avro_codec_decode(avro_codec_t c, void * data, int64_t len)
 	case AVRO_CODEC_SNAPPY:
 		return decode_snappy(c, data, len);
 #endif
-//#ifdef DEFLATE_CODEC
+#ifdef DEFLATE_CODEC
 	case AVRO_CODEC_DEFLATE:
 		return decode_deflate(c, data, len);
-//#endif
+#endif
 #ifdef LZMA_CODEC
 	case AVRO_CODEC_LZMA:
 		return decode_lzma(c, data, len);
@@ -600,10 +600,10 @@ int avro_codec_reset(avro_codec_t c)
 	case AVRO_CODEC_SNAPPY:
 		return reset_snappy(c);
 #endif
-//#ifdef DEFLATE_CODEC
+#ifdef DEFLATE_CODEC
 	case AVRO_CODEC_DEFLATE:
 		return reset_deflate(c);
-//#endif
+#endif
 #ifdef LZMA_CODEC
 	case AVRO_CODEC_LZMA:
 		return reset_lzma(c);
