@@ -83,7 +83,7 @@
     }
     
     avro_file_writer_t writer = NULL;
-    if (avro_file_writer_create_with_codec([filePath cStringUsingEncoding:NSUTF8StringEncoding], schema, &writer, "deflate", 0) != 0) {
+    if (avro_file_writer_create([filePath cStringUsingEncoding:NSUTF8StringEncoding], schema, &writer) != 0) {
         if (error != NULL) {
             NSString *errorMsg = [NSString stringWithFormat:@"Couldn't create file writer: %s (%d)", avro_strerror(), errno];
             NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
