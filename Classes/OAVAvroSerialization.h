@@ -109,6 +109,16 @@ typedef void * OAVFileWriterToken;
                    error:( NSError * _Nullable  __autoreleasing *)error;
 
 /**
+*  Creates a Foundation object from Avro written file.
+*
+*  @param filePath  fiel path to saved avro file
+*  @param error      A pointer to the error object that will represent any errors ocurred
+*
+*  @return An array of json strings
+*/
+- (NSArray *)JSONObjectsFromFile:(NSString *)filePath error:(NSError * __autoreleasing *)error;
+
+/**
  *  Register a schema so the wrapper can serialize objects later.
  *
  *  @param schema A JSON describing the Avro schema
