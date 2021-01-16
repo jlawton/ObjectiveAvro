@@ -63,6 +63,111 @@
 
 #pragma mark - Public methods
 
+- (OAVFileWriterToken)startFile:(NSString *)filePath
+                 forSchemaNamed:(NSString *)schemaName
+                          error:(NSError * __autoreleasing *)error {
+    NSParameterAssert(schemaName);
+    NSParameterAssert(filePath);
+    
+    avro_schema_t schema;
+    [self.avroSchemas[schemaName] getValue:&schema];
+    
+    if (!schema) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:@"No schema found for name: %@", schemaName];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+        return nil;
+    }
+    
+    avro_file_writer_t writer = NULL;
+    if (avro_file_writer_create_with_codec([filePath cStringUsingEncoding:NSUTF8StringEncoding], schema, &writer, "deflate", 0) != 0) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:@"Couldn't create file writer: %s (%d)", avro_strerror(), errno];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+        return nil;
+    }
+    return writer;
+}
+
+- (OAVFileWriterToken)openFile:(NSString *)filePath
+                         error:(NSError * __autoreleasing *)error {
+    NSParameterAssert(filePath);
+    avro_file_writer_t writer = NULL;
+    if (avro_file_writer_open([filePath cStringUsingEncoding:NSUTF8StringEncoding], &writer) != 0) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:@"Couldn't open file writer: %s (%d)", avro_strerror(), errno];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+        return nil;
+    }
+    return writer;
+}
+
+- (BOOL)writeJSONObjects:(NSArray *)jsonObjects
+                toWriter:(avro_file_writer_t)writer
+          forSchemaNamed:(NSString *)schemaName
+                   error:(NSError * __autoreleasing *)error {
+    NSParameterAssert(schemaName);
+    NSParameterAssert(jsonObjects);
+    NSParameterAssert(writer);
+    NSDictionary *jsonSchema = self.jsonSchemas[schemaName];
+    if (!jsonSchema) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:@"No schema found for name: %@", schemaName];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+        return NO;
+    }
+    for (id json in jsonObjects) {
+        avro_datum_t datum = [self valueForSchema:jsonSchema values:json];
+        if (avro_file_writer_append(writer, datum) != 0) {
+            if (error != NULL) {
+                NSString *errorMsg = [NSString stringWithFormat:@"Couldn't create file writer: %s (%d)", avro_strerror(), errno];
+                NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                         userInfo:userInfo];
+            }
+            avro_datum_decref(datum);
+            return NO;
+        }
+        avro_datum_decref(datum);
+    }
+    return YES;
+}
+
+- (void)closeFile:(avro_file_writer_t)writer {
+    avro_file_writer_close(writer);
+}
+
+- (BOOL)writeJSONObjects:(NSArray *)jsonObjects
+                 toFile:(NSString *)filePath
+         forSchemaNamed:(NSString *)schemaName
+                  error:(NSError * __autoreleasing *)error {
+    NSParameterAssert(schemaName);
+    NSParameterAssert(jsonObjects);
+    NSParameterAssert(filePath);
+    
+    avro_file_writer_t writer = [self startFile:filePath forSchemaNamed:schemaName error:&error];
+    if (!writer) {
+        return NO;
+    }
+    if (![self writeJSONObjects:jsonObjects toWriter:writer forSchemaNamed:schemaName error:&error]) {
+        return NO;
+    } 
+    [self closeFile:writer];
+    return YES;
+}
+
 - (NSData *)dataFromJSONObject:(id)jsonObject forSchemaNamed:(NSString *)schemaName
                          error:(NSError * __autoreleasing *)error {
     
@@ -133,7 +238,7 @@
     
     char buf[[data length]];
     [data getBytes:&buf length:[data length]];
-    
+
     avro_reader_t reader = avro_reader_memory(buf, sizeof(buf));
     avro_datum_t datum_out;
     
@@ -155,6 +260,65 @@
                                                    options:0 error:error];
     return jsonValue;
 }
+
+- (NSArray *)JSONObjectsFromFile:(NSString *)filePath error:(NSError * __autoreleasing *)error {
+    
+    avro_file_reader_t  reader;
+    int errno;
+    char *filename = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
+    
+    void (^reportError)(NSString* format, char* avro_message, int errono) = ^(NSString* format, char* avro_message, int errono) {
+        if (error != NULL) {
+            NSString *errorMsg = [NSString stringWithFormat:format, avro_strerror(), errono];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedStringFromTable(errorMsg, @"ObjectiveAvro", nil)};
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
+                                     userInfo:userInfo];
+        }
+    };
+
+    
+    if (errno = avro_file_reader(filename, &reader)) {
+        reportError(@"Couldn't open file reader: %s %d", avro_strerror(),errno);
+        return nil;
+    }
+
+    avro_schema_t  wschema;
+    avro_value_iface_t  *iface;
+    avro_value_t  value;
+
+    wschema = avro_file_reader_get_writer_schema(reader);
+    iface = avro_generic_class_from_schema(wschema);
+    avro_generic_value_new(iface, &value);
+
+    int rval;
+    NSMutableArray* serializedAvro = [NSMutableArray array];
+    while ((rval = avro_file_reader_read_value(reader, &value)) == 0) {
+        char  *json;
+
+        if (errno = avro_value_to_json(&value, 1, &json)) {
+            reportError(@"Error converting value to JSON: %s", avro_strerror(),errno);
+            return nil;
+        }
+        [serializedAvro addObject:[NSString stringWithUTF8String:json]];
+        avro_value_reset(&value);
+        free(json);
+    }
+
+    // If it was not an EOF that caused it to fail,
+    // print the error.
+    if (rval != EOF) {
+        reportError(@"END of file error: %s %d", avro_strerror(),errno);
+        return nil;
+    }
+
+    avro_file_reader_close(reader);
+    avro_value_decref(&value);
+    avro_value_iface_decref(iface);
+    avro_schema_decref(wschema);
+
+    return serializedAvro;
+}
+
 
 - (BOOL)registerSchema:(NSString *)schema error:(NSError * __autoreleasing *)error {
     NSParameterAssert(schema);
@@ -217,7 +381,13 @@
     
     
     if ([name isKindOfClass:[NSDictionary class]]) {
-        if ([name[@"type"] isEqual:@"array"]) {
+        if ([name[@"type"] isKindOfClass:[NSArray class]]) {    // union
+            avro_schema_t schema = avro_schema_union();
+            for (id type in name[@"type"]) {
+                avro_schema_union_append(schema, [self schemaFromName:type]);
+            }
+            return schema;
+        } else if ([name[@"type"] isEqual:@"array"]) {  // array
             avro_schema_t schema = [self schemaFromName:name[@"items"][@"name"]];
             return avro_schema_array(schema);
         }
@@ -246,8 +416,36 @@
         type = schema[@"type"];
         name = schema[@"name"];
     }
+
+    // defaults
+    if (([values isKindOfClass:[NSNull class]] || values == nil)
+        && schema[@"default"] != nil) {
+        NSMutableDictionary *defaultSchema = [schema mutableCopy];
+        defaultSchema[@"default"] = nil;
+        return [self valueForSchema:defaultSchema values:schema[@"default"]];
+    }
     
-    if ([type isEqualToString:@"string"]) {
+    // union types
+    if ([type isKindOfClass:[NSArray class]]) {
+        NSMutableDictionary *unionSchema = [schema mutableCopy];
+        
+        for (id unionType in [(NSArray *)type reverseObjectEnumerator]) {
+            unionSchema[@"type"] = unionType;
+            avro_datum_t unionValue = [self valueForSchema:unionSchema values:values];
+            if (unionValue != nil) {
+                avro_schema_t avroSchema = [self schemaFromName:schema];
+                value = avro_union(avroSchema,
+                                   [(NSArray *)type indexOfObject:unionType],
+                                   unionValue);
+                avro_schema_decref(avroSchema);
+                avro_datum_decref(unionValue);
+                return value;
+            }
+        }
+    }
+    if ([values isKindOfClass:[NSNull class]] && ![type isEqualToString:@"null"]) {
+        // if we're given a null unexpectedly, we can't do much
+    } else if ([type isEqualToString:@"string"] && [values isKindOfClass:[NSString class]]) {
         value = avro_string([values cStringUsingEncoding:NSUTF8StringEncoding]);
     } else if ([type isEqualToString:@"float"]) {
         value = avro_float([values floatValue]);
@@ -261,7 +459,7 @@
         value = avro_boolean([values boolValue]);
     } else if ([type isEqualToString:@"null"]) {
         value = avro_null();
-    } else if ([type isEqualToString:@"bytes"]) {
+    } else if ([type isEqualToString:@"bytes"] && [values isKindOfClass:[NSString class]]) {
         const char *str = [values cStringUsingEncoding:NSUTF8StringEncoding];
         value = avro_bytes(str, strlen(str) + 1);
     } else if ([type isEqualToString:@"map"]) {
@@ -310,7 +508,7 @@
             avro_datum_decref(datum);
         }];
     }
-    
+    // TODO: should throw an error here if there's no value
     return value;
 }
 

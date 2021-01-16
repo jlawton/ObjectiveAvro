@@ -2,14 +2,14 @@
 //  ObjectiveAvroTests.m
 //  ObjectiveAvroTests
 //
-//  Created by Marcelo Fabri on 14/03/14.
-//  Copyright (c) 2014 Movile. All rights reserved.
+//  Created by Max Zhilyaev on 11/19/20.
+//  This is a copy of Example/ObjectiveAbroTests.m with some moditications
+//  to remove Expecta stuff
 //
 
 #define EXP_SHORTHAND YES
 
 #import <XCTest/XCTest.h>
-#import <Expecta.h>
 #import <ObjectiveAvro/OAVAvroSerialization.h>
 
 @interface ObjectiveAvroTests : XCTestCase
@@ -23,7 +23,7 @@
 + (id)JSONObjectFromBundleResource:(NSString *)resource {
     NSString *path = [[NSBundle bundleForClass:self] pathForResource:resource ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:path];
-    
+
     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
     return dict;
 }
@@ -39,14 +39,14 @@
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict
                                                        options:0
                                                          error:&error];
-    expect(jsonData);
+    XCTAssertNotNil(jsonData);
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
 - (void)registerSchemas:(OAVAvroSerialization *)avro {
     NSString *personSchema = [[self class] stringFromBundleResource:@"person_schema"];
     NSString *peopleSchema = [[self class] stringFromBundleResource:@"people_schema"];
-    
+
     [avro registerSchema:personSchema error:NULL];
     [avro registerSchema:peopleSchema error:NULL];
 }
@@ -67,46 +67,46 @@
 
 - (void)testValidSchemaRegistration {
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
-    
+
     NSString *personSchema = [[self class] stringFromBundleResource:@"person_schema"];
     NSString *peopleSchema = [[self class] stringFromBundleResource:@"people_schema"];
-    
+
     NSError *error;
     BOOL result = [avro registerSchema:personSchema error:&error];
-    expect(result).to.beTruthy();
-    expect(error).to.beNil();
-    
+    XCTAssert(result);
+    XCTAssertNil(error);
+
     result = [avro registerSchema:peopleSchema error:&error];
-    expect(result).to.beTruthy();
-    expect(error).to.beNil();
+    XCTAssert(result);
+    XCTAssertNil(error);
 }
 
 - (void)testInvalidJSONSchemaRegistration {
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     NSError *error;
     BOOL result = [avro registerSchema:@"{invalid json}" error:&error];
-    expect(result).to.beFalsy();
-    expect(error).notTo.beNil();
+    XCTAssertFalse(result);
+    XCTAssertNotNil(error);
 }
 
 - (void)testInvalidSchemaWithNoNameRegistration {
     NSString *schema = @"{\"type\":\"record\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"country\",\"type\":\"string\"},{\"name\":\"age\",\"type\":\"int\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     NSError *error;
     BOOL result = [avro registerSchema:schema error:&error];
-    expect(result).to.beFalsy();
-    expect(error).notTo.beNil();
-    expect(error.domain).to.equal(NSCocoaErrorDomain);
-    expect(error.code).to.equal(NSPropertyListReadCorruptError);
+    XCTAssertFalse(result);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.domain,NSCocoaErrorDomain);
+    XCTAssertEqual(error.code,NSPropertyListReadCorruptError);
 }
 
 - (void)testAvroFileWrite {
     NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [self registerSchemas:avro];
-    
+
     NSError *error;
     NSString *fullAvroPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"people.avro"];
     BOOL success = [avro writeJSONObjects:@[dict]
@@ -115,313 +115,306 @@
     success = [avro writeJSONObjects:@[dict]
                               toFile:fullAvroPath
                       forSchemaNamed:@"People" error:&error];
-    
-    expect(error).to.beNil();
-    expect(success).to.beTruthy();
-    
+
+    XCTAssertNil(error);
+    XCTAssertTrue(success);
+
     NSArray* seralization = [avro JSONObjectsFromFile:fullAvroPath error:&error];
-    expect(seralization.count == 1);
-    // serealized dictionary must match the dictionary written into file
-    NSDictionary  *dictObj = [NSJSONSerialization
-                              JSONObjectWithData:[[seralization objectAtIndex:0] dataUsingEncoding:NSUTF8StringEncoding]
-                              options:0
-                              error:&error];
-    expect([dictObj isEqualToDictionary:dict]);
+    XCTAssertTrue(seralization.count == 1);
+    // expect different, avro looking json
+    NSString* expectedJson = @"{\"people\": [{\"name\": \"Marcelo Fabri\", \"country\": {\"string\": \"Brazil\"}, \"age\": 20}, {\"name\": \"Tim Cook\", \"country\": {\"string\": \"USA\"}, \"age\": 53}, {\"name\": \"Steve Wozniak\", \"country\": {\"string\": \"USA\"}, \"age\": 63}, {\"name\": \"Bill Gates\", \"country\": {\"string\": \"USA\"}, \"age\": 58}, {\"name\": \"Stateless Johnny\", \"country\": null, \"age\": 104}], \"generated_timestamp\": 1389376800000}";
+    XCTAssertEqualObjects(seralization[0], expectedJson);
 }
 
 - (void)testAvroFileReopen {
     NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [self registerSchemas:avro];
-    
+
     NSError *error;
-    
+
     NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"people.avro"];
     NSLog(@"writing to %@", filePath);
     OAVFileWriterToken token = [avro startFile:filePath forSchemaNamed:@"People" error:&error];
-    expect(error).to.beNil();
-//    expect(token).toNot.beNull();
-    
+    XCTAssertNil(error);
+
     BOOL success = [avro writeJSONObjects:@[dict] toWriter:token
                            forSchemaNamed:@"People" error:&error];
-    
-    expect(error).to.beNil();
-    expect(success).to.beTruthy();
-    
+
+    XCTAssertNil(error);
+    XCTAssertTrue(success);
+
     [avro closeFile:token];
-    
+
     token = [avro openFile:filePath error:&error];
-    
-    expect(error).to.beNil();
-//    expect(token).toNot.beNull();
-    
+
+    XCTAssertNil(error);
+
     success = [avro writeJSONObjects:@[dict] toWriter:token
                            forSchemaNamed:@"People" error:&error];
-    
-    expect(error).to.beNil();
-    expect(success).to.beTruthy();
-    
+
+    XCTAssertNil(error);
+    XCTAssertTrue(success);
+
     [avro closeFile:token];
-    
+
     NSArray* seralization = [avro JSONObjectsFromFile:filePath error:&error];
-    expect(seralization.count == 2);
-    
+    XCTAssertTrue(seralization.count == 2);
+
     for (int i=0; i < 2; i++) {
-        // serealized dictionary must match the dictionary written into file
-        NSDictionary  *dictObj = [NSJSONSerialization
-                                  JSONObjectWithData:[[seralization objectAtIndex:i] dataUsingEncoding:NSUTF8StringEncoding]
-                                  options:0
-                                  error:&error];
-        expect([dictObj isEqualToDictionary:dict]);
+        NSString* expectedJson = @"{\"people\": [{\"name\": \"Marcelo Fabri\", \"country\": {\"string\": \"Brazil\"}, \"age\": 20}, {\"name\": \"Tim Cook\", \"country\": {\"string\": \"USA\"}, \"age\": 53}, {\"name\": \"Steve Wozniak\", \"country\": {\"string\": \"USA\"}, \"age\": 63}, {\"name\": \"Bill Gates\", \"country\": {\"string\": \"USA\"}, \"age\": 58}, {\"name\": \"Stateless Johnny\", \"country\": null, \"age\": 104}], \"generated_timestamp\": 1389376800000}";
+        XCTAssertEqualObjects(seralization[0], expectedJson);
+
     }
 
 }
 
 - (void)testAvroSerialization {
     NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [self registerSchemas:avro];
-    
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:dict forSchemaNamed:@"People" error:&error];
-    
-    expect(error).to.beNil();
-    expect(data).notTo.beNil();
-    
+
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     NSDictionary *fromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"People" error:&error];
-    
-    expect(error).to.beNil();
-    expect(fromAvro).notTo.beNil();
+
+    XCTAssertNil(error);
+    XCTAssertNotNil(fromAvro);
 }
 
 - (void)testAvroCopy {
     NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [self registerSchemas:avro];
-    
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:dict forSchemaNamed:@"People" error:&error];
-    
-    expect(error).to.beNil();
-    expect(data).notTo.beNil();
-    
+
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     OAVAvroSerialization *copy = [avro copy];
-    expect(copy).notTo.beNil();
-    expect(copy).toNot.equal(avro);
-    
+    XCTAssertNotNil(copy);
+    XCTAssertNotEqualObjects(copy,avro);
+
     NSData *dataFromCopy = [copy dataFromJSONObject:dict forSchemaNamed:@"People" error:&error];
-    expect(error).to.beNil();
-    expect(dataFromCopy).notTo.beNil();
-    expect(dataFromCopy).to.equal(data);
+    XCTAssertNil(error);
+    XCTAssertNotNil(dataFromCopy);
+    XCTAssertEqualObjects(dataFromCopy,data);
 }
 
 - (void)testAvroCoding {
     NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [self registerSchemas:avro];
-    
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:dict forSchemaNamed:@"People" error:&error];
-    
-    expect(error).to.beNil();
-    expect(data).notTo.beNil();
-    
+
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     NSData *archivedAvroData = [NSKeyedArchiver archivedDataWithRootObject:avro];
-    expect(archivedAvroData).notTo.beNil();
-    
+    XCTAssertNotNil(archivedAvroData);
+
     OAVAvroSerialization *archivedAvro = [NSKeyedUnarchiver unarchiveObjectWithData:archivedAvroData];
-    
-    expect(archivedAvro).notTo.beNil();
-    expect(archivedAvro).toNot.equal(avro);
-    
+
+    XCTAssertNotNil(archivedAvro);
+
     NSData *dataFromCopy = [archivedAvro dataFromJSONObject:dict
                                              forSchemaNamed:@"People" error:&error];
-    expect(error).to.beNil();
-    expect(dataFromCopy).notTo.beNil();
-    expect(dataFromCopy).to.equal(data);
+    
+    XCTAssertEqualObjects(dataFromCopy, data);
+    XCTAssertNil(error);
+    XCTAssertNotNil(dataFromCopy);
+    XCTAssertEqualObjects(dataFromCopy,data);
 }
 
 // we should fail, but schema validation doesn't seem to work correctly
 //  @TODO - https://mindstronghealth.atlassian.net/browse/HEALTH-5227
 - (void)testMissingFieldAvroSerialization {
     NSString *json = @"{\"people\":[{\"name\":\"Marcelo Fabri\"},{\"name\":\"Tim Cook\",\"country\":\"USA\",\"age\":53},{\"name\":\"Steve Wozniak\",\"country\":\"USA\",\"age\":63},{\"name\":\"Bill Gates\",\"country\":\"USA\",\"age\":58}],\"generated_timestamp\":1389376800000}";
-    
+
     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [self registerSchemas:avro];
-    
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:dict forSchemaNamed:@"People" error:&error];
-    
-    expect(error).toNot.beNil();
-    expect(error.domain).to.equal(NSCocoaErrorDomain);
-    expect(error.code).to.equal(NSPropertyListReadCorruptError);
-    expect(data).to.beNil();
+
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.domain,NSCocoaErrorDomain);
+    XCTAssertEqual(error.code,NSPropertyListReadCorruptError);
+    XCTAssertNil(data);
 }
 
 - (void)testNoSchemaRegistred {
     NSDictionary *dict = [[self class] JSONObjectFromBundleResource:@"people"];
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
-    
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:dict forSchemaNamed:@"People" error:&error];
-    
-    expect(error).toNot.beNil();
-    expect(error.domain).to.equal(NSCocoaErrorDomain);
-    expect(error.code).to.equal(NSFileReadNoSuchFileError);
-    expect(data).to.beNil();
+
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.domain,NSCocoaErrorDomain);
+    XCTAssertEqual(error.code,NSFileReadNoSuchFileError);
+    XCTAssertNil(data);
 }
 
-#pragma mark - Type tests 
+#pragma mark - Type tests
 
 - (void)testStringType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"StringTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"string_value\",\"type\":\"string\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
 
     NSArray *strings = @[@"bla", @"test", @"foo", @"bar"];
-    
+
     for (NSString *str in strings) {
         NSError *error;
         NSData *data = [avro dataFromJSONObject:@{@"string_value": str} forSchemaNamed:@"StringTest" error:&error];
-        expect(error).to.beNil();
-        expect(data).toNot.beNil();
-        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+
         NSString *strFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"StringTest" error:&error][@"string_value"];
-        
-        expect(error).to.beNil();
-        expect(strFromAvro).to.equal(str);
+
+        XCTAssertNil(error);
+        XCTAssertEqualObjects(strFromAvro,str);
     }
 }
 
 - (void)testIntType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"IntTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"int_value\",\"type\":\"int\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
+
     NSArray *numbers = @[@2, @303, @1098, @500000, @-200, @-100001, @0];
-    
+
     for (NSNumber *number in numbers) {
         NSError *error;
         NSData *data = [avro dataFromJSONObject:@{@"int_value": number} forSchemaNamed:@"IntTest" error:&error];
-        expect(error).to.beNil();
-        expect(data).toNot.beNil();
-        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+
         NSString *numberFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"IntTest" error:&error][@"int_value"];
-        
-        expect(error).to.beNil();
-        expect(numberFromAvro).to.equal(number);
+
+        XCTAssertNil(error);
+        XCTAssertEqualObjects(numberFromAvro,number);
     }
 }
 
 - (void)testLongType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"LongTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"long_value\",\"type\":\"long\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
+
     NSArray *numbers = @[@2, @303, @1098, @500000,  @-200, @-100001, @0, @((long) pow(2, 30)), @((long) pow(-2, 30))];
-    
+
     for (NSNumber *number in numbers) {
         NSError *error;
         NSData *data = [avro dataFromJSONObject:@{@"long_value": number} forSchemaNamed:@"LongTest" error:&error];
-        expect(error).to.beNil();
-        expect(data).toNot.beNil();
-        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+
         NSString *numberFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"LongTest" error:&error][@"long_value"];
-        
-        expect(error).to.beNil();
-        expect(numberFromAvro).to.equal(number);
+
+        XCTAssertNil(error);
+        XCTAssertEqualObjects(numberFromAvro,number);
     }
 }
 
 - (void)testFloatType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"FloatTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"float_value\",\"type\":\"float\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
+
     NSArray *numbers = @[@2, @303, @1098, @500000, @-200, @-100001, @0, @1.43f, @100.98420f, @0.001f, @-9.7431f];
-    
+
     for (NSNumber *number in numbers) {
         NSError *error;
         NSData *data = [avro dataFromJSONObject:@{@"float_value": number} forSchemaNamed:@"FloatTest" error:&error];
-        expect(error).to.beNil();
-        expect(data).toNot.beNil();
-        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+
         NSString *numberFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"FloatTest" error:&error][@"float_value"];
-        
-        expect(error).to.beNil();
-        expect(numberFromAvro).to.beCloseToWithin(number, .01);
+
+        XCTAssertNil(error);
+        XCTAssertEqualWithAccuracy([numberFromAvro floatValue], [number floatValue], 0.01);
     }
 }
 
 - (void)testDoubleType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"DoubleTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"double_value\",\"type\":\"double\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
+
     NSArray *numbers = @[@2, @303, @1098, @500000, @-200, @-100001, @0, @1.43, @100.98420, @0.001, @-9.7431, @(DBL_MAX), @((double) pow(2.4, 20)), @(M_PI)];
-    
+
     for (NSNumber *number in numbers) {
         NSError *error;
         NSData *data = [avro dataFromJSONObject:@{@"double_value": number} forSchemaNamed:@"DoubleTest" error:&error];
-        expect(error).to.beNil();
-        expect(data).toNot.beNil();
-        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+
         NSString *numberFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"DoubleTest" error:&error][@"double_value"];
-        
-        expect(error).to.beNil();
-        expect(numberFromAvro).to.equal(number);
+
+        XCTAssertNil(error);
+        XCTAssertEqualObjects(numberFromAvro,number);
     }
 }
 
 - (void)testBooleanType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"BooleanTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"boolean_value\",\"type\":\"boolean\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
+
     NSArray *numbers = @[@NO, @YES];
-    
+
     for (NSNumber *number in numbers) {
         NSError *error;
         NSData *data = [avro dataFromJSONObject:@{@"boolean_value": number} forSchemaNamed:@"BooleanTest" error:&error];
-        expect(error).to.beNil();
-        expect(data).toNot.beNil();
-        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+
         NSString *numberFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"BooleanTest" error:&error][@"boolean_value"];
-        
-        expect(error).to.beNil();
-        expect(numberFromAvro).to.equal(number);
+
+        XCTAssertNil(error);
+        XCTAssertEqual(numberFromAvro,number);
     }
 }
 
 - (void)testNullType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"NullTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"null_value\",\"type\":\"null\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
-    
+
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:@{@"null_value": [NSNull null]} forSchemaNamed:@"NullTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
-    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     id nullFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"NullTest" error:&error][@"null_value"];
-    
-    expect(error).to.beNil();
-    expect(nullFromAvro).to.equal([NSNull null]);
+
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(nullFromAvro, [NSNull null]);
 }
 
 - (void)testArrayType {
@@ -429,119 +422,119 @@
 
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
-    
+
+
     NSError *error;
     NSArray *array = @[@1, @5, @-2, @0, @10021, @500000];
     NSData *data = [avro dataFromJSONObject:array forSchemaNamed:@"ArrayTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
-    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     NSArray *arrayFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"ArrayTest" error:&error];
-    
-    expect(error).to.beNil();
-    expect(arrayFromAvro).to.equal(array);
+
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(arrayFromAvro,array);
 }
 
 - (void)testMapType {
     NSString *schema = @"{\"type\":\"map\",\"name\":\"MapTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"values\": \"int\"}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
-    
+
+
     NSError *error;
     NSDictionary *map = @{@"one": @1, @"zero": @0, @"two": @2, @"-one": @-1};
     NSData *data = [avro dataFromJSONObject:map forSchemaNamed:@"MapTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
-    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     NSDictionary *mapFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"MapTest" error:&error];
-    
-    expect(error).to.beNil();
-    expect(mapFromAvro).to.equal(map);
+
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(mapFromAvro,map);
 }
 
 - (void)testBytesType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"BytesTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"bytes_value\",\"type\":\"bytes\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
-    
+
+
     NSError *error;
     NSString *bytes = @"\"\\u00de\\u00ad\\u00be\\u00ef\"";
-    
+
     NSData *data = [avro dataFromJSONObject:@{@"bytes_value": bytes} forSchemaNamed:@"BytesTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
-    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     id bytesFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"BytesTest" error:&error][@"bytes_value"];
-    
-    expect(error).to.beNil();
-    expect(bytesFromAvro).to.equal(bytes);
+
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(bytesFromAvro,bytes);
 }
 
 - (void)testUnionType {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"UnionTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"null\", \"string\"],  \"default\": null}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
-    
+
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:@{@"union_value": [NSNull null]} forSchemaNamed:@"UnionTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
-    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     id nullFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"UnionTest" error:&error][@"union_value"];
-    
-    expect(error).to.beNil();
-    expect(nullFromAvro).to.equal([NSNull null]);
-    
+
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(nullFromAvro, [NSNull null]);
+
     data = [avro dataFromJSONObject:@{@"union_value": @"Tibet"} forSchemaNamed:@"UnionTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
-    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     id stringFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"UnionTest" error:&error][@"union_value"];
-    
-    expect(error).to.beNil();
-    expect(stringFromAvro).to.equal(@{@"string": @"Tibet"});
+
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(stringFromAvro, @{@"string": @"Tibet"});
 }
 
 - (void)testDefault {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"UnionTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"union_value\",\"type\":[\"int\", \"string\"], \"default\": 10}, {\"name\":\"no_default\",\"type\":\"string\"}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
-    
+
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:@{@"no_default": @"hey"} forSchemaNamed:@"UnionTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
-    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     NSString *numberFromAvro = [avro JSONObjectFromData:data forSchemaNamed:@"UnionTest" error:&error][@"union_value"];
-    
-    expect(error).to.beNil();
-    expect(numberFromAvro).to.equal(@{@"int": @10});
+
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(numberFromAvro, @{@"int": @10});
 }
 
 - (void)testNullDefault {
     NSString *schema = @"{\"type\":\"record\",\"name\":\"NumericDefaultTest\",\"namespace\":\"com.movile.objectiveavro.unittest.v1\",\"fields\":[{\"name\":\"test\",\"type\":[\"null\", \"long\"], \"default\": null}]}";
-    
+
     OAVAvroSerialization *avro = [[OAVAvroSerialization alloc] init];
     [avro registerSchema:schema error:NULL];
-    
-    
+
+
     NSError *error;
     NSData *data = [avro dataFromJSONObject:@{@"test": @10} forSchemaNamed:@"NumericDefaultTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
-    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
     data = [avro dataFromJSONObject:@{@"test": [NSNull null]} forSchemaNamed:@"NumericDefaultTest" error:&error];
-    expect(error).to.beNil();
-    expect(data).toNot.beNil();
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
 }
 
 @end
